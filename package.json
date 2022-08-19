@@ -17,8 +17,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "concurrently \"npm run reactStart\" \"npm run electronStart\"",
+    "reactStart": "react-scripts start",
+    "electronStart": "wait-on http://localhost:3000 && electron .",
+    "reactBuild": "react-scripts build",
+    "electronBuild": "tsc ./public/electron.ts",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -39,5 +42,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "concurrently": "^7.3.0",
+    "electron": "^20.0.3",
+    "wait-on": "^6.0.1"
+  },
+  "main": "public/electron.js",
+  "homepage": "./"
 }
