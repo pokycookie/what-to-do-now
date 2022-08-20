@@ -1,3 +1,5 @@
+export type TModal = "editTask";
+
 export interface ITask {
   content: string;
   importance: number;
