@@ -16,9 +16,13 @@ interface ICalendar {
   status: TStatus;
 }
 
+interface IProps {
+  onChange?: (date: Date) => void;
+}
+
 const dayArr = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-export default function Calendar() {
+export default function Calendar(props: IProps) {
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [tableArr, setTableArr] = useState<ICalendar[]>([]);
@@ -56,10 +60,8 @@ export default function Calendar() {
   }, [year, month]);
 
   const tableHandler = (data: ICalendar) => {
-    const date = new Date(data.ISO);
-    console.log(
-      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-    );
+    const ISODate = new Date(data.ISO);
+    if (props.onChange) props.onChange(ISODate);
   };
 
   return (

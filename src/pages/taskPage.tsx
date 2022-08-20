@@ -15,7 +15,7 @@ export default function TaskPage(props: IProps) {
 
   return (
     <div className="taskPage">
-      <Calendar />
+      <Calendar onChange={(date) => console.log(date.toString())} />
       <button className="addTaskBtn" onClick={addTaskHandler}>
         <FontAwesomeIcon icon={faPlus} />
       </button>
