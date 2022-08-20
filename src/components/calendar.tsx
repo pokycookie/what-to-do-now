@@ -26,6 +26,7 @@ export default function Calendar(props: IProps) {
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [tableArr, setTableArr] = useState<ICalendar[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const firstDay = new Date(year, month, 1).getDay();
@@ -61,6 +62,7 @@ export default function Calendar(props: IProps) {
 
   const tableHandler = (data: ICalendar) => {
     const ISODate = new Date(data.ISO);
+    setSelectedDate(ISODate);
     if (props.onChange) props.onChange(ISODate);
   };
 
@@ -93,10 +95,13 @@ export default function Calendar(props: IProps) {
           return (
             <button
               key={index}
-              className={`${element.status} ${getWeekday(index)}`}
+              className={`${element.status}${getWeekday(index)}${getSelected(
+                element,
+                selectedDate
+              )}${getToday(element)}`}
               onClick={() => tableHandler(element)}
             >
-              {element.value}
+              <p className="value">{element.value}</p>
             </button>
           );
         })}
@@ -108,9 +113,38 @@ export default function Calendar(props: IProps) {
 function getWeekday(index: number) {
   const result = (index + 1) % 7;
   if (result === 1) {
-    return "sunday";
+    return " sunday";
   } else if (result === 0) {
-    return "saturday";
+    return " saturday";
+  } else {
+    return "";
+  }
+}
+
+function getSelected(element: ICalendar, selectedDate: Date | null) {
+  const ISODate = new Date(element.ISO);
+  if (selectedDate === null) return "";
+  if (
+    ISODate.getFullYear() === selectedDate.getFullYear() &&
+    ISODate.getMonth() === selectedDate.getMonth() &&
+    ISODate.getDate() === selectedDate.getDate()
+  ) {
+    return " selected";
+  } else {
+    return "";
+  }
+}
+
+function getToday(element: ICalendar) {
+  const ISODate = new Date(element.ISO);
+  const today = new Date();
+
+  if (
+    ISODate.getFullYear() === today.getFullYear() &&
+    ISODate.getMonth() === today.getMonth() &&
+    ISODate.getDate() === today.getDate()
+  ) {
+    return " today";
   } else {
     return "";
   }

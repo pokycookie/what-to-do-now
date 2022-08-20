@@ -44,20 +44,46 @@
       border: none;
       background-color: white;
       cursor: pointer;
-    }
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-    .current {
-      color: black;
-      &.sunday {
-        color: red;
+      .value {
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
-      &.saturday {
-        color: blue;
+
+      &.current {
+        color: black;
+        &.sunday > p {
+          color: red;
+        }
+        &.saturday > p {
+          color: blue;
+        }
+        &.today > p {
+          width: 25px;
+          height: 25px;
+          border-radius: 100%;
+          background-color: #a66cff;
+          color: white;
+        }
       }
-    }
-    .prev,
-    .next {
-      color: gray;
+      &.prev,
+      &.next {
+        color: gray;
+      }
+
+      &.selected {
+        background-color: #a66cff;
+        color: white;
+      }
+
+      &:hover {
+        background-color: #a66cff;
+        color: white;
+      }
     }
   }
 }
