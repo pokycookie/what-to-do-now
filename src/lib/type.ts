@@ -16,3 +16,9 @@ export interface IFixedTask {
   endTime: Date;
   updated: Date;
 }
+
+export interface ITime {
+  hour?: number;
+  minute?: number;
+  second?: number;
+}
