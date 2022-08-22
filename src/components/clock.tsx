@@ -1,4 +1,4 @@
-import Slider from "./slider";
+import Counter from "./counter";
 import "../scss/components/clock.scss";
 import { useEffect, useState } from "react";
 import { ITime } from "../lib/type";
@@ -18,8 +18,8 @@ export default function Clock(props: IProps) {
 
   return (
     <div className="clock">
-      <Slider min={0} max={23} onChange={(value) => setHour(value)} />
-      <Slider min={0} max={59} onChange={(value) => setMinute(value)} />
+      <Counter min={0} max={23} onChange={(value) => setHour(value)} />
+      <Counter min={0} max={59} onChange={(value) => setMinute(value)} />
     </div>
   );
 }
