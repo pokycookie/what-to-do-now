@@ -14,7 +14,7 @@ interface IProps {
 export default function Counter(props: IProps) {
   const step = props.step || 1;
 
-  const [value, setValue] = useState(props.default || 0);
+  const [value, setValue] = useState(props.default || props.min);
 
   // On change
   useEffect(() => {

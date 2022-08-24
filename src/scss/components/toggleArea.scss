@@ -3,6 +3,7 @@
   border-radius: 15px;
   background-color: #eeeeee;
   transition: all 0.5s ease-in-out;
+  overflow: hidden;
 
   .btnArea {
     width: 100%;
@@ -21,5 +22,7 @@
 
   .contentArea {
     width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
   }
 }

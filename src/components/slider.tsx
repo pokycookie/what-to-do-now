@@ -20,8 +20,8 @@ interface IStyles {
 export default function Slider(props: IProps) {
   // default값이 min ~ max 범위에 있는지 확인 필요
   const defaultIndex = props.default ? props.default - props.min : 0;
-  const HEIGHT = props.height || 25;
-  const COUNT = props.count || 5;
+  const HEIGHT = props.height || 20;
+  const COUNT = props.count || 4;
 
   const [valueArr, setValueArr] = useState<number[]>([]);
   const [index, setIndex] = useState<number>(defaultIndex);

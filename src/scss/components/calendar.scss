@@ -1,9 +1,14 @@
 .calendar {
-  width: 400px;
+  width: 100%;
+  user-select: none;
+  background-color: #2c3333;
+  color: white;
+  border-radius: 10px;
+  overflow: hidden;
 
   .navigation {
     width: 100%;
-    height: 20px;
+    height: 30px;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -11,9 +16,19 @@
     button {
       width: 40px;
       height: 100%;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      background-color: #2c3333;
+      color: white;
+
+      &:hover {
+        background-color: #6c7171;
+      }
     }
     button:nth-child(3) {
       width: 100%;
+      font-weight: 600;
     }
   }
 
@@ -22,6 +37,8 @@
     height: 25px;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    font-size: 11px;
+    font-weight: 600;
 
     p {
       width: 100%;
@@ -42,11 +59,12 @@
       width: 100%;
       height: 30px;
       border: none;
-      background-color: white;
+      background-color: #2c3333;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: all 0.2s;
 
       .value {
         display: flex;
@@ -55,18 +73,18 @@
       }
 
       &.current {
-        color: black;
+        color: white;
         &.sunday > p {
-          color: red;
+          color: #eb1d36;
         }
         &.saturday > p {
-          color: blue;
+          color: #0096ff;
         }
         &.today > p {
           width: 25px;
           height: 25px;
           border-radius: 100%;
-          background-color: #a66cff;
+          background-color: #6c7171;
           color: white;
         }
       }
@@ -76,12 +94,12 @@
       }
 
       &.selected {
-        background-color: #a66cff;
+        background-color: #6c7171;
         color: white;
       }
 
       &:hover {
-        background-color: #a66cff;
+        background-color: #6c7171;
         color: white;
       }
     }
