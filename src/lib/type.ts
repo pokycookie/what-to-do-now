@@ -5,7 +5,7 @@ export interface ITask {
   importance: number;
   updated: Date;
   deadLine?: Date;
-  timeTaken?: Date;
+  timeTaken?: number;
   urgency?: number;
   weight?: number;
 }

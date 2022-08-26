@@ -16,7 +16,7 @@ export default function Clock(props: IProps) {
   useEffect(() => {
     const timeObj: ITime = { hour, minute };
     if (props.onChange) props.onChange(timeObj);
-  }, [hour, minute, props]);
+  }, [hour, minute]);
 
   return (
     <div className="clock">

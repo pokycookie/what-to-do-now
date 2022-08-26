@@ -35,13 +35,14 @@ export default function Slider(props: IProps) {
       tempArr.push(i + props.min);
     }
     setValueArr(tempArr);
-  }, [props]);
+  }, [props.max, props.min]);
 
   // On change
   useEffect(() => {
     if (props.onChange) props.onChange(valueArr[index]);
   }, [index, props, valueArr]);
 
+  // Up handler
   const upValue = () => {
     let tempIndex = index + 1;
     if (tempIndex > props.max) {
@@ -50,6 +51,7 @@ export default function Slider(props: IProps) {
     setIndex(tempIndex);
   };
 
+  // Down handler
   const downValue = () => {
     let tempIndex = index - 1;
     if (tempIndex < props.min) {
@@ -58,6 +60,7 @@ export default function Slider(props: IProps) {
     setIndex(tempIndex);
   };
 
+  // Scroll handler
   const scrollHandler = (e: React.WheelEvent) => {
     if (e.deltaY < 0) {
       upValue();

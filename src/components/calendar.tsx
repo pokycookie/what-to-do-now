@@ -26,7 +26,7 @@ export default function Calendar(props: IProps) {
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [tableArr, setTableArr] = useState<ICalendar[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   useEffect(() => {
     const firstDay = new Date(year, month, 1).getDay();
