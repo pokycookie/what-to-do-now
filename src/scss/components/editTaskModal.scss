@@ -1,10 +1,9 @@
 .editTaskModal {
-  width: 500px;
+  width: 400px;
   height: 600px;
   background-color: white;
   border-radius: 20px;
   box-sizing: border-box;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -13,6 +12,8 @@
 
   .top {
     width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
 
     input {
       width: 100%;
@@ -30,11 +31,19 @@
       }
     }
 
-    .expired {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .optionArea {
+      height: 400px;
+      overflow-y: auto;
+      border-radius: 10px;
+
+      &::-webkit-scrollbar {
+        width: 0px;
+        height: 0px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background-color: #1b2433;
+      }
     }
   }
 
@@ -43,6 +52,8 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
 
     button {
       width: 80px;

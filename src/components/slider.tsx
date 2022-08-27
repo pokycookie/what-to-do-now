@@ -8,6 +8,7 @@ interface IProps {
   height?: number;
   count?: number;
   onChange?: (value: number) => void;
+  scrlk?: (scrlk: boolean) => void;
 }
 
 interface IStyles {
@@ -69,8 +70,13 @@ export default function Slider(props: IProps) {
     }
   };
 
+  // Scroll lock
+  const scrlk = (bool: boolean) => {
+    if (props.scrlk) props.scrlk(bool);
+  };
+
   return (
-    <div className="slider">
+    <div className="slider" onMouseEnter={() => scrlk(true)} onMouseLeave={() => scrlk(false)}>
       <div
         className="indicators"
         onWheel={scrollHandler}
