@@ -21,6 +21,7 @@ export default function EditTaskModal(props: IProps) {
   const [SCRLK, setSCRLK] = useState(false); // scroll lock
 
   const [deadLineOption, setDeadLineOption] = useState(false);
+  const [clockOption, setClockOption] = useState(false);
   const [importanceOption, setImportanceOption] = useState(false);
   const [content, setContent] = useState("");
   const [calendar, setCalendar] = useState(current);
@@ -36,7 +37,7 @@ export default function EditTaskModal(props: IProps) {
 
   const submitHandler = () => {
     const deadLineMoment = moment(calendar);
-    if (clock.hour && clock.minute) {
+    if (clockOption && clock.hour && clock.minute) {
       deadLineMoment.hour(clock.hour).minute(clock.minute);
     }
     const deadLine = new Date(deadLineMoment.toISOString());
@@ -60,10 +61,8 @@ export default function EditTaskModal(props: IProps) {
   useEffect(() => {
     if (scrlkRef.current !== null) {
       if (SCRLK) {
-        console.log("lock");
         scrlkRef.current.style.overflowY = "hidden";
       } else {
-        console.log("open");
         scrlkRef.current.style.overflowY = "auto";
       }
     }
@@ -76,14 +75,14 @@ export default function EditTaskModal(props: IProps) {
         <div className="optionArea" ref={scrlkRef}>
           <ToggleArea title="DeadLine" onChange={(toggle) => setDeadLineOption(toggle)}>
             <Calendar onChange={(date) => setCalendar(date)} />
-          </ToggleArea>
-          <ToggleArea title="Time">
-            <Clock
-              onChange={(timeObj) => setClock(timeObj)}
-              hour={current.getHours()}
-              minute={current.getMinutes()}
-              scrlk={(scrlk) => setSCRLK(scrlk)}
-            />
+            <ToggleArea title="Time" onChange={(toggle) => setClockOption(toggle)}>
+              <Clock
+                onChange={(timeObj) => setClock(timeObj)}
+                hour={current.getHours()}
+                minute={current.getMinutes()}
+                scrlk={(scrlk) => setSCRLK(scrlk)}
+              />
+            </ToggleArea>
           </ToggleArea>
           <ToggleArea title="Importance" onChange={(toggle) => setImportanceOption(toggle)}>
             <RaitingBar onChange={(rate) => setImportance(rate)} />

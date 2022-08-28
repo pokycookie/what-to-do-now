@@ -26,20 +26,41 @@ export default function Clock(props: IProps) {
 
   return (
     <div className="clock">
-      <Slider
-        min={0}
-        max={23}
-        onChange={(value) => setHour(value)}
-        default={hour}
-        scrlk={(bool) => scrlk(bool)}
-      />
-      <Slider
-        min={0}
-        max={59}
-        onChange={(value) => setMinute(value)}
-        default={minute}
-        scrlk={(bool) => scrlk(bool)}
-      />
+      <div className="indicators">
+        <p>{getIndicators(hour, minute)}</p>
+      </div>
+      <div className="sliderArea">
+        <Slider
+          min={0}
+          max={23}
+          onChange={(value) => setHour(value)}
+          default={hour}
+          scrlk={(bool) => scrlk(bool)}
+        />
+        <Slider
+          min={0}
+          max={59}
+          onChange={(value) => setMinute(value)}
+          default={minute}
+          scrlk={(bool) => scrlk(bool)}
+        />
+      </div>
     </div>
   );
 }
+
+const getDoubleDigit = (value: number) => {
+  if (value < 10) return `0${value}`;
+  return `${value}`;
+};
+
+const getIndicators = (hour: number, minute: number) => {
+  const AMPM = hour < 12 ? "AM" : "PM";
+  let tempHour = hour;
+
+  if (AMPM === "PM") {
+    tempHour = hour - 12;
+  }
+
+  return `${getDoubleDigit(tempHour)}:${getDoubleDigit(minute)} ${AMPM}`;
+};
