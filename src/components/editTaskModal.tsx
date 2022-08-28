@@ -6,6 +6,7 @@ import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
 import Clock from "./clock";
 import RaitingBar from "./raitingBar";
+import Toggle from "./toggle";
 import ToggleArea from "./toggleArea";
 
 interface IProps {
@@ -30,6 +31,7 @@ export default function EditTaskModal(props: IProps) {
     minute: current.getMinutes(),
   });
   const [importance, setImportance] = useState(0);
+  const [timeTaken, setTimeTaken] = useState(0);
 
   const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContent(e.target.value);
@@ -45,6 +47,7 @@ export default function EditTaskModal(props: IProps) {
     if (content.trim() !== "" && props.DB) {
       const data: ITask = {
         content,
+        timeTaken,
         importance: importanceOption ? importance : 0,
         updated: new Date(),
       };
@@ -56,6 +59,14 @@ export default function EditTaskModal(props: IProps) {
 
   const cancelHandler = () => {
     props.setModal(null);
+  };
+
+  const timeTakenHandler = (timeObj: ITime) => {
+    if (timeObj.hour && timeObj.minute) {
+      const hourToMinute = timeObj.hour * 60;
+      const tempValue = hourToMinute + timeObj.minute;
+      setTimeTaken(tempValue);
+    }
   };
 
   useEffect(() => {
@@ -73,7 +84,15 @@ export default function EditTaskModal(props: IProps) {
       <div className="top">
         <input autoFocus value={content} onChange={inputHandler} />
         <div className="optionArea" ref={scrlkRef}>
-          <ToggleArea title="DeadLine" onChange={(toggle) => setDeadLineOption(toggle)}>
+          <ToggleArea title="Time taken" alwaysOpen>
+            <Clock
+              onChange={(timeObj) => timeTakenHandler(timeObj)}
+              scrlk={(scrlk) => setSCRLK(scrlk)}
+              hourMax={48}
+              noneAMPM
+            />
+          </ToggleArea>
+          <ToggleArea title="Deadline" onChange={(toggle) => setDeadLineOption(toggle)}>
             <Calendar onChange={(date) => setCalendar(date)} />
             <ToggleArea title="Time" onChange={(toggle) => setClockOption(toggle)}>
               <Clock

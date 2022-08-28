@@ -6,10 +6,11 @@ interface IProps {
   title: string;
   children?: JSX.Element | JSX.Element[];
   onChange?: (toggle: boolean) => void;
+  alwaysOpen?: boolean;
 }
 
 export default function ToggleArea(props: IProps) {
-  const [toggle, setToggle] = useState(false);
+  const [toggle, setToggle] = useState(props.alwaysOpen ? true : false);
 
   useEffect(() => {}, [toggle, props]);
 
@@ -22,7 +23,7 @@ export default function ToggleArea(props: IProps) {
     <div className="toggleArea">
       <div className="btnArea">
         <p className="title">{props.title}</p>
-        <Toggle onChange={(value) => toggleHandler(value)} />
+        {props.alwaysOpen ? null : <Toggle onChange={(value) => toggleHandler(value)} />}
       </div>
       {toggle ? <div className="contentArea">{props.children}</div> : null}
     </div>

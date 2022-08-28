@@ -6,6 +6,11 @@ import Slider from "./slider";
 interface IProps {
   hour?: number;
   minute?: number;
+  hourMin?: number;
+  hourMax?: number;
+  minuteMin?: number;
+  minuteMax?: number;
+  noneAMPM?: boolean;
   onChange?: (timeObj: ITime) => void;
   scrlk?: (scrlk: boolean) => void;
 }
@@ -27,19 +32,19 @@ export default function Clock(props: IProps) {
   return (
     <div className="clock">
       <div className="indicators">
-        <p>{getIndicators(hour, minute)}</p>
+        <p>{getIndicators(hour, minute, props.noneAMPM)}</p>
       </div>
       <div className="sliderArea">
         <Slider
-          min={0}
-          max={23}
+          min={props.hourMin || 0}
+          max={props.hourMax || 23}
           onChange={(value) => setHour(value)}
           default={hour}
           scrlk={(bool) => scrlk(bool)}
         />
         <Slider
-          min={0}
-          max={59}
+          min={props.minuteMin || 0}
+          max={props.minuteMax || 59}
           onChange={(value) => setMinute(value)}
           default={minute}
           scrlk={(bool) => scrlk(bool)}
@@ -54,13 +59,17 @@ const getDoubleDigit = (value: number) => {
   return `${value}`;
 };
 
-const getIndicators = (hour: number, minute: number) => {
-  const AMPM = hour < 12 ? "AM" : "PM";
-  let tempHour = hour;
+const getIndicators = (hour: number, minute: number, noneAMPM: boolean | undefined) => {
+  if (noneAMPM) {
+    return `${getDoubleDigit(hour)}:${getDoubleDigit(minute)}`;
+  } else {
+    const AMPM = hour < 12 ? "AM" : "PM";
+    let tempHour = hour;
 
-  if (AMPM === "PM") {
-    tempHour = hour - 12;
+    if (AMPM === "PM") {
+      tempHour = hour - 12;
+    }
+
+    return `${getDoubleDigit(tempHour)}:${getDoubleDigit(minute)} ${AMPM}`;
   }
-
-  return `${getDoubleDigit(tempHour)}:${getDoubleDigit(minute)} ${AMPM}`;
 };
