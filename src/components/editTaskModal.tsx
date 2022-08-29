@@ -2,11 +2,11 @@ import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
 import { ITask, ITime, TModal } from "../lib/type";
+import { getAT } from "../lib/urgency";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
 import Clock from "./clock";
 import RaitingBar from "./raitingBar";
-import Toggle from "./toggle";
 import ToggleArea from "./toggleArea";
 
 interface IProps {
@@ -41,6 +41,8 @@ export default function EditTaskModal(props: IProps) {
     const deadLineMoment = moment(calendar);
     if (clockOption && clock.hour && clock.minute) {
       deadLineMoment.hour(clock.hour).minute(clock.minute);
+    } else {
+      deadLineMoment.hour(23).minute(59);
     }
     const deadLine = new Date(deadLineMoment.toISOString());
 
@@ -51,7 +53,11 @@ export default function EditTaskModal(props: IProps) {
         importance: importanceOption ? importance : 0,
         updated: new Date(),
       };
+      // deadline
       if (deadLineOption) data.deadLine = deadLine;
+      // urgency
+      data.urgency = timeTaken / getAT(new Date(), deadLine);
+
       IndexedDB.create<ITask>(props.DB, "task", data);
       props.setModal(null);
     }
@@ -62,7 +68,7 @@ export default function EditTaskModal(props: IProps) {
   };
 
   const timeTakenHandler = (timeObj: ITime) => {
-    if (timeObj.hour && timeObj.minute) {
+    if (typeof timeObj.hour === "number" && typeof timeObj.minute === "number") {
       const hourToMinute = timeObj.hour * 60;
       const tempValue = hourToMinute + timeObj.minute;
       setTimeTaken(tempValue);

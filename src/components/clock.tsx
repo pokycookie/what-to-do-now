@@ -59,7 +59,7 @@ const getDoubleDigit = (value: number) => {
   return `${value}`;
 };
 
-const getIndicators = (hour: number, minute: number, noneAMPM: boolean | undefined) => {
+const getIndicators = (hour: number, minute: number, noneAMPM?: boolean) => {
   if (noneAMPM) {
     return `${getDoubleDigit(hour)}:${getDoubleDigit(minute)}`;
   } else {

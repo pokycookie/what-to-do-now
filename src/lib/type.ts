@@ -4,8 +4,8 @@ export interface ITask {
   content: string;
   importance: number;
   updated: Date;
+  timeTaken: number;
   deadLine?: Date;
-  timeTaken?: number;
   urgency?: number;
   weight?: number;
 }
