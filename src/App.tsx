@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import EditTaskModal from "./components/editTaskModal";
 import IndexedDB from "./lib/indexedDB";
 import { TModal } from "./lib/type";
+import ModalSwitch from "./modalSwitch";
 import TaskPage from "./pages/taskPage";
 
 export default function App() {
@@ -21,11 +21,8 @@ export default function App() {
       <div className="nonModal" style={modal ? { filter: "blur(3px)" } : undefined}>
         <TaskPage setModal={setModal} />
       </div>
-      {modal ? (
-        <div className="modalArea">
-          <EditTaskModal setModal={setModal} DB={DB} />
-        </div>
-      ) : null}
+
+      <ModalSwitch modal={modal} setModal={setModal} DB={DB} />
     </div>
   );
 }

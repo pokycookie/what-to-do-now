@@ -12,9 +12,16 @@ export default function TaskPage(props: IProps) {
     props.setModal("editTask");
   };
 
+  const addFixedTaskHandler = () => {
+    props.setModal("editFixedTask");
+  };
+
   return (
     <div className="taskPage">
       <button className="addTaskBtn" onClick={addTaskHandler}>
+        <FontAwesomeIcon icon={faPlus} />
+      </button>
+      <button className="addTaskBtn" onClick={addFixedTaskHandler}>
         <FontAwesomeIcon icon={faPlus} />
       </button>
     </div>
