@@ -1,7 +1,7 @@
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
-import { ITask, ITime, TModal } from "../lib/type";
+import { ITask, ITime, TModal, TStore } from "../lib/type";
 import { getAT } from "../lib/urgency";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
@@ -12,6 +12,7 @@ import ToggleArea from "./toggleArea";
 interface IProps {
   DB?: IDBDatabase;
   setModal: React.Dispatch<React.SetStateAction<TModal | null>>;
+  refresh: (store: TStore) => void;
 }
 
 export default function EditTaskModal(props: IProps) {
@@ -20,7 +21,6 @@ export default function EditTaskModal(props: IProps) {
   const scrlkRef = useRef<HTMLDivElement>(null);
 
   const [SCRLK, setSCRLK] = useState(false); // scroll lock
-
   const [deadLineOption, setDeadLineOption] = useState(false);
   const [clockOption, setClockOption] = useState(false);
   const [importanceOption, setImportanceOption] = useState(false);
@@ -39,7 +39,7 @@ export default function EditTaskModal(props: IProps) {
 
   const submitHandler = () => {
     const deadLineMoment = moment(calendar);
-    if (clockOption && clock.hour && clock.minute) {
+    if (clockOption) {
       deadLineMoment.hour(clock.hour).minute(clock.minute);
     } else {
       deadLineMoment.hour(23).minute(59);
@@ -68,11 +68,9 @@ export default function EditTaskModal(props: IProps) {
   };
 
   const timeTakenHandler = (timeObj: ITime) => {
-    if (typeof timeObj.hour === "number" && typeof timeObj.minute === "number") {
-      const hourToMinute = timeObj.hour * 60;
-      const tempValue = hourToMinute + timeObj.minute;
-      setTimeTaken(tempValue);
-    }
+    const hourToMinute = timeObj.hour * 60;
+    const tempValue = hourToMinute + timeObj.minute;
+    setTimeTaken(tempValue);
   };
 
   useEffect(() => {

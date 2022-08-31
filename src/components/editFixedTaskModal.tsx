@@ -1,7 +1,7 @@
 import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
-import { IFixedTask, ITime, TModal } from "../lib/type";
+import { IFixedTask, ITime, TModal, TStore } from "../lib/type";
 import { checkFixedTask } from "../lib/urgency";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
@@ -11,6 +11,7 @@ import ToggleArea from "./toggleArea";
 interface IProps {
   DB?: IDBDatabase;
   setModal: React.Dispatch<React.SetStateAction<TModal | null>>;
+  refresh: (store: TStore) => void;
 }
 
 export default function EditFixedTaskModal(props: IProps) {

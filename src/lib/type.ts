@@ -1,4 +1,6 @@
-export type TModal = "editTask";
+export type TModal = "editTask" | "editFixedTask";
+export type TStore = "task" | "fixedTask";
+export type TRepeatType = "yearly" | "monthly" | "weekly" | "daily";
 
 export interface ITask {
   content: string;
@@ -15,10 +17,11 @@ export interface IFixedTask {
   startTime: Date;
   endTime: Date;
   updated: Date;
+  repeatType?: TRepeatType;
+  repeat?: Date;
 }
 
 export interface ITime {
-  hour?: number;
-  minute?: number;
-  second?: number;
+  hour: number;
+  minute: number;
 }
