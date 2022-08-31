@@ -78,13 +78,15 @@ interface IFixedTask {
   content: string;
   startTime: Date;
   endTime: Date;
+  updated: Date;
+  repeatType?: TRepeatType;
+  repeat?: any;
 }
 ```
 
 ```ts
 export interface ITime {
-  hour?: number;
-  minute?: number;
-  second?: number;
+  hour: number;
+  minute: number;
 }
 ```

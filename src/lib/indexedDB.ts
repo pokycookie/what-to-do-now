@@ -1,3 +1,5 @@
+import { TStore } from "./type";
+
 export default class IndexedDB {
   static open(name: string, version: number): Promise<IDBDatabase> {
     // Open DB
@@ -21,24 +23,28 @@ export default class IndexedDB {
           });
           taskStore.createIndex("content", "content");
           taskStore.createIndex("urgency", "urgency");
+          taskStore.createIndex("deadLine", "deadLine");
 
           const fixedTaskStore = IDB.createObjectStore("fixedTask", {
             keyPath: "_id",
             autoIncrement: true,
           });
           fixedTaskStore.createIndex("content", "content");
-          fixedTaskStore.createIndex("startTime", "stratTime");
+          fixedTaskStore.createIndex("startTime", "startTime");
           fixedTaskStore.createIndex("endTime", "endTime");
+          fixedTaskStore.createIndex("repeat", "repeat");
+
+          const trash = IDB.createObjectStore("trash", {
+            keyPath: "_id",
+            autoIncrement: true,
+          });
+          trash.createIndex("type", "type");
         }
       };
     });
   }
 
-  static create<T>(
-    DB: IDBDatabase,
-    store: string,
-    data: T
-  ): Promise<IDBValidKey> {
+  static create<T>(DB: IDBDatabase, store: string, data: T): Promise<IDBValidKey> {
     // Open transaction
     const transaction = DB.transaction(store, "readwrite");
 
@@ -56,11 +62,7 @@ export default class IndexedDB {
     });
   }
 
-  static read<T>(
-    DB: IDBDatabase,
-    store: string,
-    query: IDBValidKey | IDBKeyRange
-  ): Promise<T> {
+  static read<T>(DB: IDBDatabase, store: string, query: IDBValidKey | IDBKeyRange): Promise<T> {
     // Open transaction
     const transaction = DB.transaction(store, "readonly");
 
@@ -78,12 +80,7 @@ export default class IndexedDB {
     });
   }
 
-  static update(
-    DB: IDBDatabase,
-    store: string,
-    query: IDBValidKey,
-    data: any
-  ): Promise<any> {
+  static update(DB: IDBDatabase, store: string, query: IDBValidKey, data: any): Promise<any> {
     // Open transaction
     const transaction = DB.transaction(store, "readwrite");
 
@@ -126,11 +123,7 @@ export default class IndexedDB {
     });
   }
 
-  static delete(
-    DB: IDBDatabase,
-    store: string,
-    query: IDBValidKey | IDBKeyRange
-  ): Promise<any> {
+  static delete(DB: IDBDatabase, store: string, query: IDBValidKey | IDBKeyRange): Promise<any> {
     // Open transaction
     const transaction = DB.transaction(store, "readwrite");
 
@@ -148,7 +141,7 @@ export default class IndexedDB {
     });
   }
 
-  static readAll(DB: IDBDatabase, store: string): Promise<any[]> {
+  static readAll<T>(DB: IDBDatabase, store: TStore): Promise<T[]> {
     // Open transaction
     const transaction = DB.transaction(store, "readonly");
 
@@ -156,7 +149,7 @@ export default class IndexedDB {
     return new Promise((resolve, rejects) => {
       const objectStore = transaction.objectStore(store);
       const request = objectStore.openCursor();
-      const result: any[] = [];
+      const result: T[] = [];
 
       request.onerror = () => {
         rejects(request.error);
