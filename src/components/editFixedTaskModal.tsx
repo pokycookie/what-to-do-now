@@ -1,11 +1,12 @@
 import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
-import { IFixedTask, ITime, TModal, TStore } from "../lib/type";
+import { IFixedTask, ITime, TModal, TStore, TRepeatType } from "../lib/type";
 import { checkFixedTask } from "../lib/urgency";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
 import Clock from "./clock";
+import Select from "./select";
 import ToggleArea from "./toggleArea";
 
 interface IProps {
@@ -18,11 +19,18 @@ export default function EditFixedTaskModal(props: IProps) {
   const current = new Date();
   const scrlkRef = useRef<HTMLDivElement>(null);
 
+  // Scroll lock
   const [SCRLK, setSCRLK] = useState(false);
+
+  // Options
   const [startTimeOption, setStartTimeOption] = useState(false);
   const [endTimeOption, setEndTimeOption] = useState(false);
+  const [repeatOption, setRepeatOption] = useState(false);
+
+  // Value
   const [startCalendar, setStartCalendar] = useState(current);
   const [endCalendar, setEndCalendar] = useState(current);
+  const [repeatType, setRepeatType] = useState<TRepeatType>("weekly");
   const [startClock, setStartClock] = useState<ITime>({ hour: 0, minute: 0 });
   const [endClock, setEndClock] = useState<ITime>({ hour: 23, minute: 59 });
   const [content, setContent] = useState("");
@@ -95,6 +103,9 @@ export default function EditFixedTaskModal(props: IProps) {
                 scrlk={(scrlk) => setSCRLK(scrlk)}
               />
             </ToggleArea>
+          </ToggleArea>
+          <ToggleArea title="Repeat" onChange={(toggle) => setRepeatOption(toggle)}>
+            <Select options={["yearly", "monthly", "weeekly", "daily"]} multiSelect />
           </ToggleArea>
         </div>
       </div>
