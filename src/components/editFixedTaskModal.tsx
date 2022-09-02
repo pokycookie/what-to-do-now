@@ -9,6 +9,8 @@ import Clock from "./clock";
 import Select from "./select";
 import ToggleArea from "./toggleArea";
 
+const repeatArr: TRepeatType[] = ["yearly", "monthly", "weekly", "daily"];
+
 interface IProps {
   DB?: IDBDatabase;
   setModal: React.Dispatch<React.SetStateAction<TModal | null>>;
@@ -30,7 +32,7 @@ export default function EditFixedTaskModal(props: IProps) {
   // Value
   const [startCalendar, setStartCalendar] = useState(current);
   const [endCalendar, setEndCalendar] = useState(current);
-  const [repeatType, setRepeatType] = useState<TRepeatType>("weekly");
+  const [repeatType, setRepeatType] = useState<TRepeatType>(repeatArr[0]);
   const [startClock, setStartClock] = useState<ITime>({ hour: 0, minute: 0 });
   const [endClock, setEndClock] = useState<ITime>({ hour: 23, minute: 59 });
   const [content, setContent] = useState("");
@@ -57,8 +59,15 @@ export default function EditFixedTaskModal(props: IProps) {
         endTime: tempEndTime,
         updated: new Date(),
       };
+      if (repeatOption) data.repeatType = repeatType;
       IndexedDB.create<IFixedTask>(props.DB, "fixedTask", data);
       props.setModal(null);
+    }
+  };
+
+  const selectHandler = (result: string | string[]) => {
+    if (typeof result === "string") {
+      setRepeatType(result as TRepeatType);
     }
   };
 
@@ -105,7 +114,7 @@ export default function EditFixedTaskModal(props: IProps) {
             </ToggleArea>
           </ToggleArea>
           <ToggleArea title="Repeat" onChange={(toggle) => setRepeatOption(toggle)}>
-            <Select options={["yearly", "monthly", "weeekly", "daily"]} multiSelect />
+            <Select options={repeatArr} onChange={(result) => selectHandler(result)} />
           </ToggleArea>
         </div>
       </div>

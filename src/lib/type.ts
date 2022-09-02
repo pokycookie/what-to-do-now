@@ -18,7 +18,6 @@ export interface IFixedTask {
   endTime: Date;
   updated: Date;
   repeatType?: TRepeatType;
-  repeat?: Date;
 }
 
 export interface ITime {
