@@ -2,6 +2,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TaskList from "../components/taskList";
 import { IFixedTask, ITask, TModal } from "../lib/type";
+import { getAT } from "../lib/urgency";
 import "../scss/pages/taskPage.scss";
 
 interface IProps {
@@ -20,11 +21,16 @@ export default function TaskPage(props: IProps) {
     props.setModal("editFixedTask");
   };
 
+  const clickHandler = (data: ITask) => {
+    const urgency = data.timeTaken / getAT(props.fixedTaskDB, new Date(), data.deadLine);
+    console.log(urgency);
+  };
+
   return (
     <div className="taskPage">
       <div className="taskListArea">
         {props.taskDB.map((element, index) => {
-          return <TaskList data={element} key={index} />;
+          return <TaskList data={element} key={index} onClick={(data) => clickHandler(data)} />;
         })}
       </div>
       <div className="addArea">

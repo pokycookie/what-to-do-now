@@ -32,7 +32,7 @@ export default class IndexedDB {
           fixedTaskStore.createIndex("content", "content");
           fixedTaskStore.createIndex("startTime", "startTime");
           fixedTaskStore.createIndex("endTime", "endTime");
-          fixedTaskStore.createIndex("repeat", "repeat");
+          fixedTaskStore.createIndex("repeatType", "repeatType");
 
           const trash = IDB.createObjectStore("trash", {
             keyPath: "_id",

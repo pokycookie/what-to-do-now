@@ -1,7 +1,7 @@
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
-import { ITask, ITime, TModal, TStore } from "../lib/type";
+import { IFixedTask, ITask, ITime, TModal, TStore } from "../lib/type";
 import { getAT } from "../lib/urgency";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
@@ -13,6 +13,7 @@ interface IProps {
   DB?: IDBDatabase;
   setModal: React.Dispatch<React.SetStateAction<TModal | null>>;
   refresh: (store: TStore) => void;
+  fixedTaskDB: IFixedTask[];
 }
 
 export default function EditTaskModal(props: IProps) {
@@ -56,7 +57,7 @@ export default function EditTaskModal(props: IProps) {
       // deadline
       if (deadLineOption) data.deadLine = deadLine;
       // urgency
-      data.urgency = timeTaken / getAT(new Date(), deadLine);
+      data.urgency = timeTaken / getAT(props.fixedTaskDB, new Date(), deadLine);
 
       IndexedDB.create<ITask>(props.DB, "task", data);
       props.setModal(null);

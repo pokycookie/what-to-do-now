@@ -58,7 +58,13 @@ export default function App() {
         <TaskPage setModal={setModal} DB={DB} taskDB={taskDB} fixedTaskDB={fixedTaskDB} />
       </div>
 
-      <ModalSwitch modal={modal} setModal={setModal} DB={DB} refresh={refresh} />
+      <ModalSwitch
+        modal={modal}
+        setModal={setModal}
+        DB={DB}
+        refresh={refresh}
+        fixedTaskDB={fixedTaskDB}
+      />
     </div>
   );
 }

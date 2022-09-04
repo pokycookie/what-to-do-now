@@ -2,7 +2,6 @@ import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
 import { IFixedTask, ITime, TModal, TStore, TRepeatType } from "../lib/type";
-import { checkFixedTask } from "../lib/urgency";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
 import Clock from "./clock";
@@ -73,7 +72,6 @@ export default function EditFixedTaskModal(props: IProps) {
 
   const cancelHandler = () => {
     props.setModal(null);
-    if (props.DB) checkFixedTask(props.DB);
   };
 
   useEffect(() => {
