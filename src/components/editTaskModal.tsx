@@ -1,8 +1,8 @@
-import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
+import { Time } from "../lib/time";
 import { IFixedTask, ITask, ITime, TModal, TStore } from "../lib/type";
-import { getAT } from "../lib/urgency";
+// import { getAT } from "../lib/urgency";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
 import Clock from "./clock";
@@ -39,13 +39,13 @@ export default function EditTaskModal(props: IProps) {
   };
 
   const submitHandler = () => {
-    const deadLineMoment = moment(calendar);
+    const deadLineMoment = new Time();
     if (clockOption) {
-      deadLineMoment.hour(clock.hour).minute(clock.minute);
+      deadLineMoment.setTime({ hour: clock.hour, minute: clock.minute });
     } else {
-      deadLineMoment.hour(23).minute(59);
+      deadLineMoment.setTime({ hour: 23, minute: 59 });
     }
-    const deadLine = new Date(deadLineMoment.toISOString());
+    const deadLine = deadLineMoment.toDate();
 
     if (content.trim() !== "" && props.DB) {
       const data: ITask = {
@@ -57,7 +57,7 @@ export default function EditTaskModal(props: IProps) {
       // deadline
       if (deadLineOption) data.deadLine = deadLine;
       // urgency
-      data.urgency = timeTaken / getAT(props.fixedTaskDB, new Date(), deadLine);
+      // data.urgency = timeTaken / getAT(props.fixedTaskDB, new Date(), deadLine);
 
       IndexedDB.create<ITask>(props.DB, "task", data);
       props.setModal(null);
@@ -97,9 +97,15 @@ export default function EditTaskModal(props: IProps) {
               noneAMPM
             />
           </ToggleArea>
-          <ToggleArea title="Deadline" onChange={(toggle) => setDeadLineOption(toggle)}>
+          <ToggleArea
+            title="Deadline"
+            onChange={(toggle) => setDeadLineOption(toggle)}
+          >
             <Calendar onChange={(date) => setCalendar(date)} />
-            <ToggleArea title="Time" onChange={(toggle) => setClockOption(toggle)}>
+            <ToggleArea
+              title="Time"
+              onChange={(toggle) => setClockOption(toggle)}
+            >
               <Clock
                 onChange={(timeObj) => setClock(timeObj)}
                 hour={current.getHours()}
@@ -108,7 +114,10 @@ export default function EditTaskModal(props: IProps) {
               />
             </ToggleArea>
           </ToggleArea>
-          <ToggleArea title="Importance" onChange={(toggle) => setImportanceOption(toggle)}>
+          <ToggleArea
+            title="Importance"
+            onChange={(toggle) => setImportanceOption(toggle)}
+          >
             <RaitingBar onChange={(rate) => setImportance(rate)} />
           </ToggleArea>
         </div>

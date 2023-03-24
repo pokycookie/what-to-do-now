@@ -1,6 +1,6 @@
-import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import IndexedDB from "../lib/indexedDB";
+import { Time } from "../lib/time";
 import { IFixedTask, ITime, TModal, TStore, TRepeatType } from "../lib/type";
 import "../scss/components/editTaskModal.scss";
 import Calendar from "./calendar";
@@ -45,10 +45,20 @@ export default function EditFixedTaskModal(props: IProps) {
     let tempEndTime = changeDateTime(endCalendar, 23, 59, 0);
 
     if (startTimeOption) {
-      tempStartTime = changeDateTime(tempStartTime, startClock.hour, startClock.minute, 0);
+      tempStartTime = changeDateTime(
+        tempStartTime,
+        startClock.hour,
+        startClock.minute,
+        0
+      );
     }
     if (endTimeOption) {
-      tempEndTime = changeDateTime(tempEndTime, endClock.hour, endClock.minute, 0);
+      tempEndTime = changeDateTime(
+        tempEndTime,
+        endClock.hour,
+        endClock.minute,
+        0
+      );
     }
 
     if (content.trim() !== "" && props.DB) {
@@ -91,7 +101,10 @@ export default function EditFixedTaskModal(props: IProps) {
         <div className="optionArea" ref={scrlkRef}>
           <ToggleArea title="Start time" alwaysOpen>
             <Calendar onChange={(date) => setStartCalendar(date)} />
-            <ToggleArea title="Time" onChange={(toggle) => setStartTimeOption(toggle)}>
+            <ToggleArea
+              title="Time"
+              onChange={(toggle) => setStartTimeOption(toggle)}
+            >
               <Clock
                 onChange={(timeObj) => setStartClock(timeObj)}
                 hour={0}
@@ -102,7 +115,10 @@ export default function EditFixedTaskModal(props: IProps) {
           </ToggleArea>
           <ToggleArea title="End time" alwaysOpen>
             <Calendar onChange={(date) => setEndCalendar(date)} />
-            <ToggleArea title="Time" onChange={(toggle) => setEndTimeOption(toggle)}>
+            <ToggleArea
+              title="Time"
+              onChange={(toggle) => setEndTimeOption(toggle)}
+            >
               <Clock
                 onChange={(timeObj) => setEndClock(timeObj)}
                 hour={23}
@@ -111,8 +127,14 @@ export default function EditFixedTaskModal(props: IProps) {
               />
             </ToggleArea>
           </ToggleArea>
-          <ToggleArea title="Repeat" onChange={(toggle) => setRepeatOption(toggle)}>
-            <Select options={repeatArr} onChange={(result) => selectHandler(result)} />
+          <ToggleArea
+            title="Repeat"
+            onChange={(toggle) => setRepeatOption(toggle)}
+          >
+            <Select
+              options={repeatArr}
+              onChange={(result) => selectHandler(result)}
+            />
           </ToggleArea>
         </div>
       </div>
@@ -124,6 +146,11 @@ export default function EditFixedTaskModal(props: IProps) {
   );
 }
 
-const changeDateTime = (date: Date, hour: number, minute: number, second: number) => {
-  return new Date(moment(date).hour(hour).minute(minute).second(second).toISOString());
+const changeDateTime = (
+  date: Date,
+  hour: number,
+  minute: number,
+  second: number
+) => {
+  return new Time(date).setTime({ hour, minute, second }).toDate();
 };

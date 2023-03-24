@@ -1,4 +1,4 @@
-import moment from "moment";
+import { Time } from "../lib/time";
 import { ITask } from "../lib/type";
 import "../scss/components/taskList.scss";
 
@@ -15,7 +15,9 @@ export default function TaskList(props: IProps) {
   return (
     <div className="taskList" onClick={() => clickHandler(props.data)}>
       <p>{props.data.content}</p>
-      {props.data.deadLine ? <p>{moment(props.data.deadLine).format("yyyy-MM-DD HH:mm")}</p> : null}
+      {props.data.deadLine ? (
+        <p>{new Time(props.data.deadLine ?? new Date()).format()}</p>
+      ) : null}
     </div>
   );
 }
