@@ -1,14 +1,10 @@
 @import "./reset.scss";
 
 .App {
-  width: 100vw;
+  width: calc(100vw - (100vw - 100%));
   height: 100vh;
   overflow: hidden;
 
-  .nonModal {
-    width: 100%;
-    height: 100%;
-  }
   .modalArea {
     width: 100vw;
     height: 100vh;
