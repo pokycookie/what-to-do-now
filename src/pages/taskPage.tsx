@@ -1,5 +1,6 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Calendar from "../components/calendar/calendar";
 import TaskList from "../components/taskList";
 import { IFixedTask, ITask, TModal } from "../lib/type";
 import "../scss/pages/taskPage.scss";
@@ -31,6 +32,7 @@ export default function TaskPage(props: IProps) {
         {/* {props.taskDB.map((element, index) => {
           return <TaskList data={element} key={index} onClick={(data) => clickHandler(data)} />;
         })} */}
+        <Calendar />
       </div>
       <div className="addArea">
         <button className="addTaskBtn" onClick={addTaskHandler}>

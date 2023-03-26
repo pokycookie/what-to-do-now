@@ -6,16 +6,19 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
 import { useEffect, useState } from "react";
 import { getDoubleDigit } from "../../lib/string";
 import { dailyArr, ICalendar } from "./core";
 import "./calendar.scss";
 
+dayjs.extend(isBetween);
+
 const dayArr = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 interface IProps {
   default?: Date;
-  onChange?: (date: Date) => void;
+  onChange?: (start: Date, end: Date) => void;
 }
 
 export default function Calendar(props: IProps) {
@@ -25,6 +28,12 @@ export default function Calendar(props: IProps) {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [calendar, setCalendar] = useState<ICalendar[]>([]);
+
+  // Select date with drag
+  const [start, setStart] = useState<Date>(now);
+  const [end, setEnd] = useState<Date>(now);
+  const [tmpStart, setTmpStart] = useState<Date | null>(null);
+  const [tmpEnd, setTmpEnd] = useState<Date | null>(null);
 
   const getClassName = (cell: ICalendar, index: number) => {
     const classList: string[] = [];
@@ -40,14 +49,17 @@ export default function Calendar(props: IProps) {
         break;
     }
     // selected
-    if (dayjs(cell.date).isSame(date, "day")) {
+    if (!tmpStart && dayjs(cell.date).isBetween(start, end, "day", "[]")) {
       classList.push("selected");
     }
     // today
     if (dayjs(cell.date).isSame(new Date(), "day")) {
       classList.push("today");
     }
-
+    // tmp selected
+    if (tmpStart && dayjs(cell.date).isBetween(tmpStart, tmpEnd, "day", "[]")) {
+      classList.push("drag");
+    }
     return classList.join(" ");
   };
 
@@ -71,9 +83,24 @@ export default function Calendar(props: IProps) {
     setMonth(tmpMonth);
   };
 
-  const cellHandler = (cell: ICalendar) => {
-    setDate(cell.date);
-    if (props.onChange) props.onChange(cell.date);
+  const cellMouseDown = (cell: ICalendar) => {
+    setTmpStart(cell.date);
+    setTmpEnd(cell.date);
+  };
+
+  const cellMouseEnter = (cell: ICalendar) => {
+    if (tmpStart) setTmpEnd(cell.date);
+  };
+
+  const cellMouseUp = (cell: ICalendar) => {
+    if (!tmpStart) return;
+
+    setStart(tmpStart);
+    setEnd(cell.date);
+    setTmpStart(null);
+    setTmpEnd(null);
+
+    if (props.onChange) props.onChange(tmpStart, cell.date);
   };
 
   useEffect(() => {
@@ -110,7 +137,9 @@ export default function Calendar(props: IProps) {
             <button
               key={i}
               className={getClassName(cell, i)}
-              onClick={() => cellHandler(cell)}
+              onMouseDown={() => cellMouseDown(cell)}
+              onMouseEnter={() => cellMouseEnter(cell)}
+              onMouseUp={() => cellMouseUp(cell)}
             >
               <p className="value">{cell.value}</p>
             </button>
