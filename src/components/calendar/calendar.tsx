@@ -17,21 +17,22 @@ dayjs.extend(isBetween);
 const dayArr = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 interface IProps {
-  default?: Date;
+  default?: { start: Date; end: Date };
   onChange?: (start: Date, end: Date) => void;
+  range?: boolean;
 }
 
 export default function Calendar(props: IProps) {
-  const now = props.default ?? new Date();
+  const nowStart = props.default?.start ?? new Date();
+  const nowEnd = props.default?.end ?? new Date();
 
-  const [date, setDate] = useState(now);
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth());
+  const [year, setYear] = useState(nowStart.getFullYear());
+  const [month, setMonth] = useState(nowStart.getMonth());
   const [calendar, setCalendar] = useState<ICalendar[]>([]);
 
   // Select date with drag
-  const [start, setStart] = useState<Date>(now);
-  const [end, setEnd] = useState<Date>(now);
+  const [start, setStart] = useState<Date>(nowStart);
+  const [end, setEnd] = useState<Date>(nowEnd);
   const [tmpStart, setTmpStart] = useState<Date | null>(null);
   const [tmpEnd, setTmpEnd] = useState<Date | null>(null);
 
@@ -84,6 +85,7 @@ export default function Calendar(props: IProps) {
   };
 
   const cellMouseDown = (cell: ICalendar) => {
+    if (!props.range) return;
     setTmpStart(cell.date);
     setTmpEnd(cell.date);
   };
@@ -93,14 +95,22 @@ export default function Calendar(props: IProps) {
   };
 
   const cellMouseUp = (cell: ICalendar) => {
-    if (!tmpStart) return;
-
-    setStart(tmpStart);
-    setEnd(cell.date);
-    setTmpStart(null);
-    setTmpEnd(null);
-
-    if (props.onChange) props.onChange(tmpStart, cell.date);
+    if (!props.range) {
+      setStart(cell.date);
+      setEnd(cell.date);
+    } else if (tmpStart) {
+      if (dayjs(cell.date).isBefore(tmpStart, "day")) {
+        setStart(cell.date);
+        setEnd(tmpStart);
+        if (props.onChange) props.onChange(cell.date, tmpStart);
+      } else {
+        setStart(tmpStart);
+        setEnd(cell.date);
+        if (props.onChange) props.onChange(tmpStart, cell.date);
+      }
+      setTmpStart(null);
+      setTmpEnd(null);
+    }
   };
 
   useEffect(() => {
