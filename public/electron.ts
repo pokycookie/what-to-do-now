@@ -4,6 +4,8 @@ const createWindow = () => {
   const window = new BrowserWindow({
     width: 1200,
     height: 700,
+    minWidth: 600,
+    minHeight: 700,
   });
   window.loadURL("http://localhost:3000");
 };

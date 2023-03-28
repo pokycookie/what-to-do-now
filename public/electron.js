@@ -4,7 +4,9 @@ var electron_1 = require("electron");
 var createWindow = function () {
     var window = new electron_1.BrowserWindow({
         width: 1200,
-        height: 700
+        height: 700,
+        minWidth: 600,
+        minHeight: 700
     });
     window.loadURL("http://localhost:3000");
 };
