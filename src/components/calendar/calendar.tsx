@@ -98,6 +98,7 @@ export default function Calendar(props: IProps) {
     if (!props.range) {
       setStart(cell.date);
       setEnd(cell.date);
+      if (props.onChange) props.onChange(cell.date, cell.date);
     } else if (tmpStart) {
       if (dayjs(cell.date).isBefore(tmpStart, "day")) {
         setStart(cell.date);
@@ -112,6 +113,11 @@ export default function Calendar(props: IProps) {
       setTmpEnd(null);
     }
   };
+
+  useEffect(() => {
+    if (!props.range) setEnd(start);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.range]);
 
   useEffect(() => {
     setCalendar(dailyArr(year, month));

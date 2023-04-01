@@ -67,12 +67,6 @@
       transition: all 0.2s;
       cursor: default;
 
-      .value {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
       &.current {
         color: white;
         &.sunday > p {
@@ -82,11 +76,7 @@
           color: #0096ff;
         }
         &.today > p {
-          width: 25px;
-          height: 25px;
-          border-radius: 100%;
-          background-color: #6c7171;
-          color: white;
+          text-decoration: underline;
         }
       }
       &.prev,
