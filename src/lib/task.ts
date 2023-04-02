@@ -42,8 +42,18 @@ export async function getTaskOrder() {
       continue;
     }
 
-    const frontOverlap = dayjs(startTime).isBetween(fixedTask.startTime, fixedTask.endTime);
-    const backOverlap = dayjs(endTime).isBetween(fixedTask.startTime, fixedTask.endTime);
+    const frontOverlap = dayjs(startTime).isBetween(
+      fixedTask.startTime,
+      fixedTask.endTime,
+      "minute",
+      "[]"
+    );
+    const backOverlap = dayjs(endTime).isBetween(
+      fixedTask.startTime,
+      fixedTask.endTime,
+      "minute",
+      "[]"
+    );
 
     // Others
     if (!dayjs(startTime).isBefore(fixedTask.endTime)) {
@@ -51,8 +61,8 @@ export async function getTaskOrder() {
       result.push({ id, taskName, startTime, endTime });
       task = tasks.pop();
       currentTime = startTime;
-    } else if (frontOverlap && backOverlap) {
-      // overlap front + back
+    } else if (backOverlap) {
+      // overlap back
       task = { id, taskName, timeTaken: task.timeTaken, deadline: fixedTask.startTime };
       fixedTask = fixedTasks.pop();
     } else if (frontOverlap) {
@@ -61,16 +71,17 @@ export async function getTaskOrder() {
       result.push({ id, taskName, startTime: fixedTask.endTime, endTime });
       task = { id, taskName, timeTaken, deadline: fixedTask.startTime };
       currentTime = fixedTask.endTime;
-    } else if (backOverlap) {
-      // overlap back
-      task = { id, taskName, timeTaken: task.timeTaken, deadline: fixedTask.startTime };
-      fixedTask = fixedTasks.pop();
-    } else {
+    }
+    // else if (backOverlap) {
+    //   // overlap back
+    //   task = { id, taskName, timeTaken: task.timeTaken, deadline: fixedTask.startTime };
+    //   fixedTask = fixedTasks.pop();
+    // }
+    else {
       // check other fixedTask
       fixedTask = fixedTasks.pop();
     }
   }
 
-  console.log(result);
   return result;
 }
