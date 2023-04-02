@@ -1,13 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import redux from "./redux";
 import App from "./App";
 import "./scss/index.scss";
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <Provider store={redux}>
+      <App />
+      <div id="modal--root"></div>
+      {/* <div id="overlay"></div> */}
+    </Provider>
   </React.StrictMode>
 );
