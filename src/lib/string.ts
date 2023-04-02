@@ -5,3 +5,7 @@ export function getDoubleDigit(value: number) {
     return `${value}`;
   }
 }
+
+export function _className(...className: string[]) {
+  return className.join(" ");
+}
