@@ -1,7 +1,36 @@
 {
   "name": "what-to-do-now",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "build": {
+    "productName": "What to do now",
+    "appId": "com.wtdn",
+    "asar": true,
+    "mac": {
+      "target": [
+        "default"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "perMachine": true,
+      "language": 1042,
+      "shortcutName": "WTDN",
+      "artifactName": "WTDN-${version}.${ext}",
+      "uninstallDisplayName": "What to do now"
+    },
+    "directories": {
+      "buildResources": "./build/",
+      "output": "./dist/"
+    }
+  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-regular-svg-icons": "^6.1.2",
@@ -29,11 +58,16 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "concurrently \"npm run reactStart\" \"npm run electronStart\"",
-    "reactStart": "react-scripts start",
-    "electronStart": "wait-on http://localhost:3000 && electron .",
-    "reactBuild": "react-scripts build",
-    "electronBuild": "tsc ./public/electron.ts",
+    "start": "concurrently \"npm run start:react\" \"npm run start:electron\"",
+    "start:react": "react-scripts start",
+    "start:electron": "wait-on http://localhost:3000 && electron .",
+    "build": "npm run build:react && npm run build:electron",
+    "build:react": "react-scripts build",
+    "build:electron": "tsc ./public/electron.ts",
+    "deploy:xos": "electron-builder --mac",
+    "deploy:win32": "electron-builder --win --ia32",
+    "deploy:win64": "electron-builder --win --x64",
+    "deploy:win": "npm run deploy:win32 && npm run deploy:win64",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -58,6 +92,7 @@
   "devDependencies": {
     "concurrently": "^7.3.0",
     "electron": "^20.0.3",
+    "electron-builder": "^23.6.0",
     "wait-on": "^6.0.1"
   },
   "main": "public/electron.js",
