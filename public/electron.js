@@ -5,10 +5,16 @@ var createWindow = function () {
     var window = new electron_1.BrowserWindow({
         width: 1200,
         height: 700,
-        minWidth: 600,
+        minWidth: 850,
         minHeight: 700
     });
     window.loadURL("http://localhost:3000");
+    // const startURL = url.format({
+    //   pathname: path.join(__dirname, "/../build/index.html"),
+    //   protocol: "file:",
+    //   slashes: true,
+    // });
+    // window.loadURL(startURL);
 };
 electron_1.app.whenReady().then(createWindow);
 electron_1.app.on("window-all-closed", function () {
