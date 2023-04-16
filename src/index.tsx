@@ -11,7 +11,6 @@ root.render(
     <Provider store={redux}>
       <App />
       <div id="modal--root"></div>
-      {/* <div id="overlay"></div> */}
     </Provider>
   </React.StrictMode>
 );

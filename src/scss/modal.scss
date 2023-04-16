@@ -9,6 +9,7 @@
   display: flex;
   justify-content: center;
   overflow: hidden;
+  z-index: 25555;
 }
 
 .modal--container {
@@ -19,4 +20,5 @@
   box-sizing: border-box;
   padding: 20px;
   overflow: hidden;
+  z-index: 25556;
 }

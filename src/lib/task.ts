@@ -71,13 +71,7 @@ export async function getTaskOrder() {
       result.push({ id, taskName, startTime: fixedTask.endTime, endTime });
       task = { id, taskName, timeTaken, deadline: fixedTask.startTime };
       currentTime = fixedTask.endTime;
-    }
-    // else if (backOverlap) {
-    //   // overlap back
-    //   task = { id, taskName, timeTaken: task.timeTaken, deadline: fixedTask.startTime };
-    //   fixedTask = fixedTasks.pop();
-    // }
-    else {
+    } else {
       // check other fixedTask
       fixedTask = fixedTasks.pop();
     }
