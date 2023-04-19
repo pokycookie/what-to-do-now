@@ -1,17 +1,16 @@
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { IReduxStore, RSetTaskOrder } from "../../redux";
 import { ITaskOrder } from "../../lib/task";
 import "./taskViewer.scss";
 import CheckBtn from "../button/checkBtn";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
 import db from "../../db";
 import { getTaskOrder } from "../../lib/task";
+import { useDataStore } from "../../zustand";
 
 dayjs.extend(relativeTime);
 
@@ -21,11 +20,8 @@ function TaskList(props: IProps) {
   const [index, setIndex] = useState(0);
   const [task, setTask] = useState<ITaskOrder[]>([]);
 
-  const taskOrder = useSelector<IReduxStore, ITaskOrder[]>((state) => {
-    return state.taskOrder;
-  }, shallowEqual);
-
-  const dispatch = useDispatch();
+  const taskOrder = useDataStore((state) => state.taskOrder);
+  const setTaskOrder = useDataStore((state) => state.setTaskOrder);
 
   const checkHandler = async (check: boolean, task: ITaskOrder) => {
     const tmpTask = await db.task.get(task.id);
@@ -39,7 +35,7 @@ function TaskList(props: IProps) {
       });
       const tmpTaskOrder = await getTaskOrder();
       setTimeout(() => {
-        dispatch(RSetTaskOrder(tmpTaskOrder));
+        setTaskOrder(tmpTaskOrder);
       }, 500);
     }
   };
@@ -77,7 +73,7 @@ function TaskList(props: IProps) {
           </div>
           <div className="mainInfo">
             <CheckBtn onChange={(check) => checkHandler(check, task[index])} />
-            <p className="taskName">{task[index].taskName}</p>
+            <p className="taskName">{task[index]?.taskName}</p>
           </div>
           <div className="subInfo">
             <p className="fromNow">{dayjs(task[index].endTime).locale("ko").fromNow()} 마감</p>

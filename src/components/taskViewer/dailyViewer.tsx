@@ -2,16 +2,13 @@ import SvgArc from "../svg/arc";
 import { useEffect, useMemo, useState } from "react";
 import SvgDonut from "../svg/donut";
 import SvgOverlay from "../svg/overlay";
-import { shallowEqual, useSelector } from "react-redux";
-import { IReduxStore } from "../../redux";
-import { ITaskOrder } from "../../lib/task";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ko";
-import { IDBFixedTask } from "../../db";
 import "./taskViewer.scss";
 import TaskList from "./taskList";
+import { useDataStore } from "../../zustand";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
@@ -35,12 +32,8 @@ function DailyViewer(props: IProps) {
   const [selected, setSelected] = useState<IArc | null>(null);
   const [dateMemo, setDateMemo] = useState(props.date);
 
-  const taskOrder = useSelector<IReduxStore, ITaskOrder[]>((state) => {
-    return state.taskOrder;
-  }, shallowEqual);
-  const fixedTask = useSelector<IReduxStore, IDBFixedTask[]>((state) => {
-    return state.fixedTask;
-  }, shallowEqual);
+  const taskOrder = useDataStore((state) => state.taskOrder);
+  const fixedTask = useDataStore((state) => state.fixedTask);
 
   const taskArc = useMemo(() => {
     return taskOrder
