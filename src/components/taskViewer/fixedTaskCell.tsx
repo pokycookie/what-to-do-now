@@ -1,9 +1,8 @@
 import dayjs from "dayjs";
-import { shallowEqual, useSelector } from "react-redux";
 import { IDBFixedTask } from "../../db";
-import { IReduxStore } from "../../redux";
 import isBetween from "dayjs/plugin/isBetween";
 import { useMemo } from "react";
+import { useDataStore } from "../../zustand";
 
 dayjs.extend(isBetween);
 
@@ -20,9 +19,7 @@ interface IProps {
 }
 
 function FixedTaskCell(props: IProps) {
-  const fixedTask = useSelector<IReduxStore, IDBFixedTask[]>((state) => {
-    return state.fixedTask;
-  }, shallowEqual);
+  const fixedTask = useDataStore((state) => state.fixedTask);
 
   const fixedTasks = useMemo(() => {
     return fixedTask

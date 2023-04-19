@@ -1,11 +1,10 @@
 import dayjs from "dayjs";
-import { shallowEqual, useSelector } from "react-redux";
 import db, { IDBTask } from "../../db";
 import { ITaskOrder } from "../../lib/task";
-import { IReduxStore } from "../../redux";
 import isBetween from "dayjs/plugin/isBetween";
 import "./taskViewer.scss";
 import { useMemo } from "react";
+import { useDataStore } from "../../zustand";
 
 dayjs.extend(isBetween);
 
@@ -22,9 +21,7 @@ interface IProps {
 }
 
 function TaskCell(props: IProps) {
-  const taskOrder = useSelector<IReduxStore, ITaskOrder[]>((state) => {
-    return state.taskOrder;
-  }, shallowEqual);
+  const taskOrder = useDataStore((state) => state.taskOrder);
 
   const taskOrders = useMemo(() => {
     return taskOrder

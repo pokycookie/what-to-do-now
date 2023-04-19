@@ -1,16 +1,7 @@
 import AddBtn from "../components/button/addBtn";
 import Modal from "../modal";
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import "../scss/pages/mainPage.scss";
 import AddTask from "./addTask";
-import {
-  IReduxStore,
-  RSetFixedTask,
-  RSetModal,
-  RSetTaskOrder,
-  TModal,
-  TViewerType,
-} from "../redux";
 import { useEffect, useState } from "react";
 import db from "../db";
 import { getTaskOrder } from "../lib/task";
@@ -18,22 +9,18 @@ import MonthlyViewer from "../components/taskViewer/monthlyViewer";
 import DailyViewer from "../components/taskViewer/dailyViewer";
 import { useInterval } from "../lib/hooks";
 import dayjs from "dayjs";
+import { useDataStore, useModalStore, useViewerStore } from "../zustand";
 
 function MainPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const modal = useSelector<IReduxStore, TModal | null>((state) => {
-    return state.modal;
-  }, shallowEqual);
-
-  const viewerType = useSelector<IReduxStore, TViewerType>((state) => {
-    return state.viewerType;
-  }, shallowEqual);
-
-  const dispatch = useDispatch();
+  const isDaily = useViewerStore((state) => state.isDaily);
+  const openModal = useModalStore((state) => state.openModal);
+  const setTaskOrder = useDataStore((state) => state.setTaskOrder);
+  const setFixedTask = useDataStore((state) => state.setFixedTask);
 
   const addModalHandler = () => {
-    dispatch(RSetModal("add"));
+    openModal("addTask");
   };
 
   useEffect(() => {
@@ -41,8 +28,8 @@ function MainPage() {
       const tmpTaskOrder = await getTaskOrder();
       const tmpFixedTask = await db.fixedTask.toArray();
 
-      dispatch(RSetTaskOrder(tmpTaskOrder));
-      dispatch(RSetFixedTask(tmpFixedTask));
+      setTaskOrder(tmpTaskOrder);
+      setFixedTask(tmpFixedTask);
     };
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,18 +53,18 @@ function MainPage() {
       }
     }
     // getTaskOrder가 1분마다 반복되는 부분 개선 필요
-    dispatch(RSetTaskOrder(await getTaskOrder()));
+    setTaskOrder(await getTaskOrder());
     setCurrentTime(now);
     console.log(now);
   }, 60000);
 
   return (
     <div className="mainPage">
-      {viewerType === "daily" ? <DailyViewer date={currentTime} /> : <MonthlyViewer />}
+      {isDaily ? <DailyViewer date={currentTime} /> : <MonthlyViewer />}
       <div className="btnArea">
         <AddBtn onClick={addModalHandler} />
       </div>
-      <Modal open={modal !== null} width="70%" minWidth="370px" maxWidth="700px" height="600px">
+      <Modal modalID="addTask" width="70%" minWidth="370px" maxWidth="700px" height="600px">
         <AddTask />
       </Modal>
     </div>

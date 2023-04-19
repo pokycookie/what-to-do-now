@@ -1,12 +1,11 @@
 import ReactDOM from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDispatch } from "react-redux";
 import "./scss/modal.scss";
-import { RSetModal } from "./redux";
+import { useModalStore } from "./zustand";
 
 interface IProps {
-  open: boolean;
-  backgroundClickClose?: boolean;
+  modalID: string | null;
+  autoClose?: boolean;
   children?: JSX.Element | JSX.Element[];
   position?: "top" | "center" | "bottom";
   width?: string;
@@ -18,11 +17,12 @@ interface IProps {
 }
 
 function Modal(props: IProps) {
-  const dispatch = useDispatch();
+  const modalID = useModalStore((state) => state.modalID);
+  const closeModal = useModalStore((state) => state.closeModal);
 
   const clickHandler = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const target = (e.target as Element).className === "modal--background";
-    if (props.backgroundClickClose && target) dispatch(RSetModal(null));
+    if (props.autoClose && target) closeModal();
   };
 
   let alignItems: string;
@@ -50,7 +50,7 @@ function Modal(props: IProps) {
   const modalRoot = document.getElementById("modal--root");
   const modalArea = (
     <AnimatePresence>
-      {props.open && (
+      {props.modalID === modalID && (
         <motion.div
           key="modal"
           className="modal--background"

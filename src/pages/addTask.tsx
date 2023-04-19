@@ -1,8 +1,6 @@
 import BackBtn from "../components/button/backBtn";
 import Calendar from "../components/calendar/calendar";
-import { useDispatch } from "react-redux";
 import "../scss/pages/addTask.scss";
-import { RSetFixedTask, RSetModal, RSetTaskOrder } from "../redux";
 import { useState, useEffect } from "react";
 import TimeSelector from "../components/select/timeSelector";
 import dayjs from "dayjs";
@@ -11,6 +9,7 @@ import Toggle from "../components/button/toggle";
 import { motion } from "framer-motion";
 import db from "../db";
 import { getTaskOrder } from "../lib/task";
+import { useDataStore, useModalStore } from "../zustand";
 
 dayjs.extend(duration);
 
@@ -21,7 +20,9 @@ function AddTask() {
   const [isFixed, setIsFixed] = useState(false);
   const [taskName, setTaskName] = useState("");
 
-  const dispatch = useDispatch();
+  const setTaskOrder = useDataStore((state) => state.setTaskOrder);
+  const setFixedTask = useDataStore((state) => state.setFixedTask);
+  const closeModal = useModalStore((state) => state.closeModal);
 
   const addHandler = async () => {
     if (isFixed) {
@@ -33,8 +34,8 @@ function AddTask() {
       } else {
         await db.fixedTask.add({ taskName, startTime: start, endTime: end });
         closeModal();
-        dispatch(RSetTaskOrder(await getTaskOrder()));
-        dispatch(RSetFixedTask(await db.fixedTask.toArray()));
+        setTaskOrder(await getTaskOrder());
+        setFixedTask(await db.fixedTask.toArray());
       }
     } else {
       // Add task
@@ -45,7 +46,7 @@ function AddTask() {
       } else {
         await db.task.add({ taskName, deadline: start, timeTaken });
         closeModal();
-        dispatch(RSetTaskOrder(await getTaskOrder()));
+        setTaskOrder(await getTaskOrder());
       }
     }
   };
@@ -56,10 +57,6 @@ function AddTask() {
     } else {
       setEnd(dayjs(end).hour(hour).minute(minute).second(0).toDate());
     }
-  };
-
-  const closeModal = () => {
-    dispatch(RSetModal(null));
   };
 
   useEffect(() => {
