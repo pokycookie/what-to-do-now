@@ -1,5 +1,6 @@
+import { css } from "@emotion/react";
 import { useState } from "react";
-import "./button.scss";
+import { bgDark, bgWhite } from "../../styles/color";
 
 interface IProps {
   size?: number;
@@ -14,29 +15,56 @@ export default function Toggle(props: IProps) {
   const [value, setValue] = useState(false);
 
   const clickHandler = () => {
-    const tempValue = value ? false : true;
-    setValue(tempValue);
-    if (props.onChange) props.onChange(tempValue);
+    setValue((prev) => !prev);
+    if (props.onChange) props.onChange(!value);
   };
 
   return (
     <div
-      className="toggle"
+      css={[
+        toggleCSS,
+        {
+          width: `${size * ratio}px`,
+          height: `${size}px`,
+          backgroundColor: value ? "#2c3333" : "#D7D7D7",
+        },
+      ]}
       onClick={clickHandler}
-      style={{
-        width: `${size * ratio}px`,
-        height: `${size}px`,
-        backgroundColor: value ? "#2c3333" : "#D7D7D7",
-      }}
     >
       <div
-        className="button"
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          left: value ? `${size * ratio - size}px` : `0px`,
-        }}
+        css={[
+          toggleDotCSS,
+          {
+            width: `${size}px`,
+            height: `${size}px`,
+            left: value ? `${size * ratio - size}px` : `0px`,
+          },
+        ]}
       ></div>
     </div>
   );
 }
+
+const toggleCSS = css({
+  width: "35px",
+  height: "17px",
+  position: "relative",
+
+  borderRadius: "20px",
+  border: `2px solid ${bgDark}`,
+  backgroundColor: bgWhite,
+
+  cursor: "pointer",
+  transition: "background-color 0.2s",
+});
+
+const toggleDotCSS = css({
+  width: "17px",
+  height: "17px",
+  position: "absolute",
+  top: 0,
+
+  borderRadius: "100%",
+  backgroundColor: "white",
+  transition: "left 0.2s",
+});

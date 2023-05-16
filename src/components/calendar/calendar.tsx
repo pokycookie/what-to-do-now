@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { useEffect, useState } from "react";
-import { getDoubleDigit } from "../../lib/string";
+import { getDoubleDigit } from "../../utils/string";
 import { dailyArr, ICalendar } from "./core";
 import "./calendar.scss";
 

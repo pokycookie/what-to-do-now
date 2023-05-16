@@ -1,27 +1,22 @@
-import AddBtn from "../components/button/addBtn";
-import Modal from "../modal";
-import "../scss/pages/mainPage.scss";
-import AddTask from "./addTask";
 import { useEffect, useState } from "react";
-import db from "../db";
-import { getTaskOrder } from "../lib/task";
-import MonthlyViewer from "../components/taskViewer/monthlyViewer";
-import DailyViewer from "../components/taskViewer/dailyViewer";
-import { useInterval } from "../lib/hooks";
 import dayjs from "dayjs";
-import { useDataStore, useModalStore, useViewerStore } from "../zustand";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAdd } from "@fortawesome/free-solid-svg-icons";
+import { css } from "@emotion/react";
+import { useDataStore, useModalStore, useViewerStore } from "@/store";
+import { getTaskOrder, useInterval } from "@/utils";
+import db from "@/db";
+import DailyViewer from "@/components/taskViewer/daily/dailyViewer";
+import MonthlyViewer from "@/components/taskViewer/monthly/monthlyViewer";
+import { addBtnCSS } from "@/styles/component";
 
-function MainPage() {
+function Main() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const isDaily = useViewerStore((state) => state.isDaily);
   const openModal = useModalStore((state) => state.openModal);
   const setTaskOrder = useDataStore((state) => state.setTaskOrder);
   const setFixedTask = useDataStore((state) => state.setFixedTask);
-
-  const addModalHandler = () => {
-    openModal("addTask");
-  };
 
   useEffect(() => {
     const init = async () => {
@@ -59,16 +54,33 @@ function MainPage() {
   }, 60000);
 
   return (
-    <div className="mainPage">
+    <section css={[mainCSS, { alignItems: isDaily ? "center" : "flex-start" }]}>
       {isDaily ? <DailyViewer date={currentTime} /> : <MonthlyViewer />}
-      <div className="btnArea">
-        <AddBtn onClick={addModalHandler} />
+      <div css={btnAreaCSS}>
+        <button css={addBtnCSS} onClick={() => openModal("addTask")}>
+          <FontAwesomeIcon icon={faAdd} />
+        </button>
       </div>
-      <Modal modalID="addTask" width="70%" minWidth="370px" maxWidth="700px" height="600px">
-        <AddTask />
-      </Modal>
-    </div>
+    </section>
   );
 }
 
-export default MainPage;
+const mainCSS = css({
+  flex: 1,
+  height: "100%",
+  position: "relative",
+
+  boxSizing: "border-box",
+  padding: "20px",
+
+  display: "flex",
+  justifyContent: "center",
+});
+
+const btnAreaCSS = css({
+  position: "absolute",
+  right: "20px",
+  bottom: "20px",
+});
+
+export default Main;

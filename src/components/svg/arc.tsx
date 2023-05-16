@@ -8,29 +8,51 @@ interface IProps {
   strokeWidth?: number;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  clipPath?: string;
+  clipPathSize?: number;
 }
 
 // Must use svg viewBox="0 0 200 200"
 function SvgArc(props: IProps) {
+  const clipPathSize = props.clipPathSize ?? 200;
+
   const strokeWidth = props.strokeWidth ?? 0;
-  const outer = (props.size ?? 100) - strokeWidth;
-  const inner = (props.holeSize ?? 80) + strokeWidth;
+  const outer = ((props.size ?? 100) - strokeWidth) * (clipPathSize / 200);
+  const inner = ((props.holeSize ?? 80) + strokeWidth) * (clipPathSize / 200);
 
-  const start = getPos(props.startDeg, outer);
-  const end = getPos(props.endDeg, outer);
+  const start = getPos(props.startDeg, outer, clipPathSize / 2, clipPathSize / 2);
+  const end = getPos(props.endDeg, outer, clipPathSize / 2, clipPathSize / 2);
 
-  const innerStart = getPos(props.startDeg, inner);
-  const innerEnd = getPos(props.endDeg, inner);
+  const innerStart = getPos(props.startDeg, inner, clipPathSize / 2, clipPathSize / 2);
+  const innerEnd = getPos(props.endDeg, inner, clipPathSize / 2, clipPathSize / 2);
 
   const startDeg = props.startDeg;
   const endDeg = props.endDeg < startDeg ? props.endDeg + 360 : props.endDeg;
 
   const largeArcFlag = endDeg - startDeg < 180 ? 0 : 1;
 
+  if (props.clipPath) {
+    return (
+      <svg>
+        <defs>
+          <clipPath id={props.clipPath}>
+            <path
+              d={`M ${start.x} ${start.y} A ${outer} ${outer} 0 ${largeArcFlag} 1 ${end.x} ${end.y} L ${innerEnd.x} ${innerEnd.y} A ${inner} ${inner} 0 ${largeArcFlag} 0 ${innerStart.x} ${innerStart.y} Z`}
+              stroke="#2c3333"
+              strokeWidth={strokeWidth}
+              fill={props.color ?? "black"}
+              onMouseEnter={props.onMouseEnter}
+              onMouseLeave={props.onMouseLeave}
+            />
+          </clipPath>
+        </defs>
+      </svg>
+    );
+  }
+
   return (
     <path
-      d={`M ${start.x} ${start.y} A ${outer} ${outer} 0 ${largeArcFlag} 1 ${end.x} ${end.y} L ${innerEnd.x} ${innerEnd.y} A ${inner} ${inner} 0 ${largeArcFlag} 0 ${innerStart.x} ${innerStart.y} Z
-        `}
+      d={`M ${start.x} ${start.y} A ${outer} ${outer} 0 ${largeArcFlag} 1 ${end.x} ${end.y} L ${innerEnd.x} ${innerEnd.y} A ${inner} ${inner} 0 ${largeArcFlag} 0 ${innerStart.x} ${innerStart.y} Z`}
       stroke="#2c3333"
       strokeWidth={strokeWidth}
       fill={props.color ?? "black"}

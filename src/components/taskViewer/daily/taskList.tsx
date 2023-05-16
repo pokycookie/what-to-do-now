@@ -1,16 +1,13 @@
-import { ITaskOrder } from "../../lib/task";
-import "./taskViewer.scss";
-import CheckBtn from "../button/checkBtn";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
-import db from "../../db";
-import { getTaskOrder } from "../../lib/task";
-import { useDataStore } from "../../zustand";
+import { ITaskOrder, getTaskOrder } from "@/utils";
+import { useDataStore } from "@/store";
+import db from "@/db";
+import { css } from "@emotion/react";
+import { textOverflowCSS } from "@/styles/component";
+import { bgGrey } from "@/styles/color";
 
 dayjs.extend(relativeTime);
 
@@ -58,41 +55,64 @@ function TaskList(props: IProps) {
   }, [taskOrder]);
 
   return (
-    <ul className="taskList" onWheel={wheelHandler}>
+    <ul css={taskListCSS} onWheel={wheelHandler}>
       {task.length > 0 ? (
-        <li className="task" key={task[index].id}>
-          <motion.button
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.8 }}
-            onClick={() => setIndex(Math.max(0, index - 1))}
-          >
+        <li css={taskItemCSS} key={task[index].id}>
+          {/* <button onClick={() => setIndex(Math.max(0, index - 1))}>
             <FontAwesomeIcon icon={faAngleUp} />
-          </motion.button>
-          <div className="taskIndex">
+          </button> */}
+          {/* <div className="taskIndex">
             [{index + 1}/{task.length}]
-          </div>
-          <div className="mainInfo">
-            <CheckBtn onChange={(check) => checkHandler(check, task[index])} />
-            <p className="taskName">{task[index]?.taskName}</p>
-          </div>
-          <div className="subInfo">
-            <p className="fromNow">{dayjs(task[index].endTime).locale("ko").fromNow()} 마감</p>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.8 }}
-            onClick={() => setIndex(Math.min(task.length - 1, index + 1))}
-          >
+          </div> */}
+
+          <p css={[taskNameCSS, textOverflowCSS]}>{task[index]?.taskName}</p>
+          <p css={fromNowCSS}>{dayjs(task[index].endTime).locale("ko").fromNow()} 마감</p>
+
+          {/* <button onClick={() => setIndex(Math.min(task.length - 1, index + 1))}>
             <FontAwesomeIcon icon={faAngleDown} />
-          </motion.button>
+          </button> */}
         </li>
       ) : (
-        <li className="task">
+        <li css={taskItemCSS}>
           <p className="taskName">할 일이 없어요!</p>
         </li>
       )}
     </ul>
   );
 }
+
+const taskListCSS = css({
+  userSelect: "none",
+});
+
+const taskItemCSS = css({
+  boxSizing: "border-box",
+  padding: "10px",
+
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "5px",
+
+  transition: "background-color 0.3s",
+});
+
+const taskNameCSS = css({
+  fontSize: "24px",
+  fontWeight: 600,
+  textAlign: "center",
+});
+
+const fromNowCSS = css({
+  width: "100%",
+
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+
+  fontSize: "13px",
+  color: bgGrey,
+});
 
 export default TaskList;
