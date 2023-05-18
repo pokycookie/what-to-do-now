@@ -32,7 +32,7 @@
     }
   },
   "dependencies": {
-    "@emotion/react": "^11.10.6",
+    "@emotion/react": "^11.11.0",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-regular-svg-icons": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
@@ -51,7 +51,6 @@
     "node-sass": "^7.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
     "react-scripts": "5.0.1",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4",
@@ -59,16 +58,16 @@
   },
   "scripts": {
     "start": "concurrently \"npm run start:react\" \"npm run start:electron\"",
-    "start:react": "react-scripts start",
+    "start:react": "craco start",
     "start:electron": "wait-on http://localhost:3000 && electron .",
     "build": "npm run build:react && npm run build:electron",
-    "build:react": "react-scripts build",
+    "build:react": "craco build",
     "build:electron": "tsc ./public/electron.ts",
     "deploy:xos": "electron-builder --mac",
     "deploy:win32": "electron-builder --win --ia32",
     "deploy:win64": "electron-builder --win --x64",
     "deploy:win": "npm run deploy:win32 && npm run deploy:win64",
-    "test": "react-scripts test",
+    "test": "craco test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -90,9 +89,12 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@emotion/babel-preset-css-prop": "^11.11.0",
     "concurrently": "^7.3.0",
     "electron": "^20.0.3",
     "electron-builder": "^23.6.0",
+    "tsconfig-paths-webpack-plugin": "^4.0.1",
     "wait-on": "^6.0.1"
   },
   "main": "public/electron.js",

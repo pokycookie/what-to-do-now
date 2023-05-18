@@ -1,14 +1,17 @@
-import SvgArc from "../svg/arc";
 import { useEffect, useMemo, useState } from "react";
-import SvgDonut from "../svg/donut";
-import SvgOverlay from "../svg/overlay";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ko";
-import "./taskViewer.scss";
 import TaskList from "./taskList";
-import { useDataStore } from "../../zustand";
+import { useDataStore } from "@/store";
+import SvgDonut from "../../svg/donut";
+import SvgOverlay from "../../svg/overlay";
+import SvgArc from "../../svg/arc";
+import { css } from "@emotion/react";
+import { textBlue, textRed } from "@/styles/color";
+import { bgDark } from "@/styles/color";
+import ListBtn from "./listBtn";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
@@ -96,10 +99,10 @@ function DailyViewer(props: IProps) {
   }, [dateMemo, props.date]);
 
   return (
-    <div className="dailyViewer">
+    <div css={dailyViewerCSS}>
       <SvgOverlay>
         <SvgDonut color="#2c3333" holeSize={85} overlay />
-        <svg viewBox="0 0 200 200" style={{ position: "absolute" }}>
+        <svg viewBox="0 0 200 200" css={{ position: "absolute" }}>
           <SvgArc startDeg={0} endDeg={currentTime} size={89} holeSize={87} color="#FF6000" />
           {arcArr.map((task, i) => {
             return (
@@ -118,11 +121,11 @@ function DailyViewer(props: IProps) {
           })}
         </svg>
       </SvgOverlay>
-      <div className="indicator">
+      <div css={indicatorCSS}>
         {selected ? (
-          <div className={`selectedTask ${selected.type}`}>
-            <p className="taskName">{selected.taskName}</p>
-            <p className="taskTime">
+          <div css={[selectedTaskCSS, { color: selected.type === "task" ? textBlue : textRed }]}>
+            <p css={taskNameCSS}>{selected.taskName}</p>
+            <p css={taskTimeCSS}>
               {selected.startTime.toLocaleTimeString()} ~ {selected.endTime.toLocaleTimeString()}
             </p>
           </div>
@@ -130,8 +133,45 @@ function DailyViewer(props: IProps) {
           <TaskList />
         )}
       </div>
+      <ListBtn direction="left" />
+      <ListBtn direction="right" />
+      <ListBtn direction="top" />
+      <ListBtn direction="bottom" />
     </div>
   );
 }
+
+const dailyViewerCSS = css({
+  width: "500px",
+  height: "500px",
+  position: "relative",
+
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+});
+
+const indicatorCSS = css({
+  position: "absolute",
+});
+
+const selectedTaskCSS = css({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+});
+
+const taskNameCSS = css({
+  fontSize: "24px",
+  fontWeight: 600,
+  marginBottom: "15px",
+});
+
+const taskTimeCSS = css({
+  fontSize: "16px",
+  fontWeight: 400,
+  color: bgDark,
+});
 
 export default DailyViewer;

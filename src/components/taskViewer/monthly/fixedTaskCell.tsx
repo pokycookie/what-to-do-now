@@ -1,32 +1,32 @@
+import { IDBFixedTask } from "@/db";
+import { useDataStore } from "@/store";
 import dayjs from "dayjs";
-import db, { IDBTask } from "../../db";
-import { ITaskOrder } from "../../lib/task";
 import isBetween from "dayjs/plugin/isBetween";
-import "./taskViewer.scss";
 import { useMemo } from "react";
-import { useDataStore } from "../../zustand";
+import { css } from "@emotion/react";
+import { bgDark, textRed } from "@/styles/color";
 
 dayjs.extend(isBetween);
 
-interface ITaskCell {
+interface IFixedTaskCell {
   left: number;
   width: number;
-  data: ITaskOrder;
+  data: IDBFixedTask;
 }
 
 interface IProps {
   date: Date;
-  onHover?: (origin: IDBTask, taskOrder: ITaskOrder) => void;
+  onHover?: (fixedTask: IDBFixedTask) => void;
   onLeave?: () => void;
 }
 
-function TaskCell(props: IProps) {
-  const taskOrder = useDataStore((state) => state.taskOrder);
+function FixedTaskCell(props: IProps) {
+  const fixedTask = useDataStore((state) => state.fixedTask);
 
-  const taskOrders = useMemo(() => {
-    return taskOrder
+  const fixedTasks = useMemo(() => {
+    return fixedTask
       .filter((task) => dayjs(props.date).isBetween(task.startTime, task.endTime, "day", "[]"))
-      .map<ITaskCell>((task) => {
+      .map<IFixedTaskCell>((task) => {
         const start = Math.max(
           (dayjs(task.startTime).diff(dayjs(props.date).startOf("day"), "minute") / 1440) * 100,
           0
@@ -41,21 +41,18 @@ function TaskCell(props: IProps) {
           data: task,
         };
       });
-  }, [props.date, taskOrder]);
+  }, [fixedTask, props.date]);
 
-  const hoverHandler = async (task: ITaskCell) => {
-    if (props.onHover) {
-      const origin = await db.task.get(task.data.id);
-      if (origin) props.onHover(origin, task.data);
-    }
+  const hoverHandler = async (task: IFixedTaskCell) => {
+    if (props.onHover) props.onHover(task.data);
   };
 
   return (
-    <div className="taskCell">
-      {taskOrders.map((task, i) => {
+    <div css={fixedTaskCellCSS}>
+      {fixedTasks.map((task, i) => {
         return (
           <div
-            className="task"
+            css={fixedTaskCSS}
             key={i}
             style={{ width: `${task.width}%`, left: `${task.left}%` }}
             onMouseEnter={() => hoverHandler(task)}
@@ -67,4 +64,18 @@ function TaskCell(props: IProps) {
   );
 }
 
-export default TaskCell;
+const fixedTaskCellCSS = css({
+  width: "100%",
+});
+
+const fixedTaskCSS = css({
+  height: "20px",
+  position: "absolute",
+
+  boxSizing: "border-box",
+  border: `1px solid ${bgDark}`,
+  padding: "0px",
+  backgroundColor: textRed,
+});
+
+export default FixedTaskCell;

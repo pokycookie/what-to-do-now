@@ -1,11 +1,14 @@
 import Nav from "./components/navigator/nav";
-import MainPage from "./pages/mainPage";
+import Main from "./pages/main";
+import ModalIndex from "./pages/modal";
+import "./styles/globals.scss";
 
 export default function App() {
   return (
     <div className="App">
       <Nav />
-      <MainPage />
+      <Main />
+      <ModalIndex />
     </div>
   );
 }

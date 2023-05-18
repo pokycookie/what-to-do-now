@@ -1,15 +1,21 @@
-import BackBtn from "../components/button/backBtn";
-import Calendar from "../components/calendar/calendar";
-import "../scss/pages/addTask.scss";
 import { useState, useEffect } from "react";
-import TimeSelector from "../components/select/timeSelector";
 import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import Toggle from "../components/button/toggle";
 import { motion } from "framer-motion";
-import db from "../db";
-import { getTaskOrder } from "../lib/task";
-import { useDataStore, useModalStore } from "../zustand";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+
+import duration from "dayjs/plugin/duration";
+
+import { css } from "@emotion/react";
+import { useDataStore, useModalStore } from "@/store";
+import { getTaskOrder } from "@/utils";
+import db from "@/db";
+import { backBtnCSS } from "@/styles/component";
+import Toggle from "@/components/button/toggle";
+import Calendar from "@/components/calendar/calendar";
+import TimeSelector from "@/components/selector/timeSelector";
+import { bgDark, bgGrey } from "@/styles/color";
 
 dayjs.extend(duration);
 
@@ -65,20 +71,23 @@ function AddTask() {
   }, [isFixed]);
 
   return (
-    <div className="addTask">
-      <div className="top">
-        <div className="title">
-          <div className="text">
-            <BackBtn onClick={closeModal} />
+    <div css={addTaskCSS}>
+      <div css={{ width: "100%" }}>
+        <div css={titleAreaCSS}>
+          <div css={titleCSS}>
+            <button css={backBtnCSS} onClick={closeModal}>
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
             <p>Add task</p>
           </div>
-          <div className="option">
+          <div css={optionAreaCSS}>
             <p>Fixed task</p>
             <Toggle onChange={(bool) => setIsFixed(bool)} />
           </div>
         </div>
-        <div className="name">
+        <div css={inputAreaCSS}>
           <input
+            css={inputCSS}
             type="text"
             placeholder="💡 추가할 일정을 알려주세요"
             autoFocus
@@ -106,7 +115,7 @@ function AddTask() {
           }}
           range={isFixed}
         />
-        <div className="start">
+        <div css={timeCSS}>
           <p className="indicator">
             {start.toLocaleDateString()} {start.toLocaleTimeString()} {isFixed ? "부터" : "까지"}
           </p>
@@ -117,11 +126,7 @@ function AddTask() {
           />
         </div>
         {isFixed ? (
-          <motion.div
-            className="end"
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-          >
+          <motion.div css={timeCSS} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
             <p className="indicator">
               {end.toLocaleDateString()} {end.toLocaleTimeString()} 까지
             </p>
@@ -133,11 +138,7 @@ function AddTask() {
           </motion.div>
         ) : null}
         {!isFixed ? (
-          <motion.div
-            className="duration"
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-          >
+          <motion.div css={timeCSS} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
             <p className="indicator">
               소요시간 {dayjs.duration(timeTaken, "minutes").hours()}시간{" "}
               {dayjs.duration(timeTaken, "minutes").minutes()}분 예상
@@ -152,11 +153,111 @@ function AddTask() {
           </motion.div>
         ) : null}
       </div>
-      <div className="bottom">
-        <button onClick={addHandler}>OK</button>
+      <div css={btnAreaCSS}>
+        <button css={submitBtnCSS} onClick={addHandler}>
+          OK
+        </button>
       </div>
     </div>
   );
 }
+
+const addTaskCSS = css({
+  width: "100%",
+  height: "100%",
+
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  alignItems: "center",
+});
+
+const btnAreaCSS = css({
+  width: "100%",
+
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+
+  marginTop: "10px",
+});
+
+const submitBtnCSS = css({
+  width: "150px",
+  height: "38px",
+
+  borderRadius: "4px",
+  backgroundColor: bgDark,
+  color: "white",
+
+  ":hover": {
+    backgroundColor: bgGrey,
+  },
+});
+
+const titleAreaCSS = css({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "10px",
+});
+
+const titleCSS = css({
+  display: "flex",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  gap: "10px",
+
+  fontSize: "16px",
+  fontWeight: 500,
+});
+
+const optionAreaCSS = css({
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  gap: "10px",
+
+  fontSize: "12px",
+  fontWeight: 400,
+});
+
+const inputAreaCSS = css({
+  width: "100%",
+  marginBottom: "10px",
+});
+
+const inputCSS = css({
+  width: "100%",
+  height: "38px",
+
+  boxSizing: "border-box",
+  borderRadius: "4px",
+  border: "1px solid hsl(0, 0%, 80%)",
+  padding: "5px 10px",
+
+  fontSize: "16px",
+  color: "hsl(0, 0%, 50%)",
+
+  ":hover": {
+    borderColor: "hsl(0, 0%, 70%)",
+  },
+  ":focus": {
+    outline: "none",
+    borderColor: "hsl(0, 0%, 50%)",
+  },
+});
+
+const timeCSS = css({
+  width: "100%",
+  marginTop: "10px",
+
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+
+  fontSize: "15px",
+  color: "hsl(0, 0%, 50%)",
+});
 
 export default AddTask;

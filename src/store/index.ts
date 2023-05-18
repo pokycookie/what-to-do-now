@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { ITaskOrder } from "./lib/task";
-import { IDBFixedTask } from "./db";
+import { ITaskOrder } from "../utils/task";
+import { IDBFixedTask } from "../db";
 
 interface IModalState {
   modalID: string | null;
