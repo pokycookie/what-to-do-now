@@ -9,8 +9,7 @@ import duration from "dayjs/plugin/duration";
 
 import { css } from "@emotion/react";
 import { useDataStore, useModalStore } from "@/store";
-import { getTaskOrder } from "@/utils";
-import db from "@/db";
+import { makeUUID } from "@/utils";
 import { backBtnCSS } from "@/styles/component";
 import Toggle from "@/components/button/toggle";
 import Calendar from "@/components/calendar/calendar";
@@ -26,11 +25,10 @@ function AddTask() {
   const [isFixed, setIsFixed] = useState(false);
   const [taskName, setTaskName] = useState("");
 
-  const setTaskOrder = useDataStore((state) => state.setTaskOrder);
-  const setFixedTask = useDataStore((state) => state.setFixedTask);
+  const { addFixedTask, addTask } = useDataStore();
   const closeModal = useModalStore((state) => state.closeModal);
 
-  const addHandler = async () => {
+  const addHandler = () => {
     if (isFixed) {
       // Add fixedTask
       if (taskName.trim() === "") {
@@ -38,10 +36,13 @@ function AddTask() {
       } else if (!dayjs(end).isAfter(start, "minute")) {
         // start, end time error
       } else {
-        await db.fixedTask.add({ taskName, startTime: start, endTime: end });
+        addFixedTask({
+          id: makeUUID(),
+          taskName,
+          startTime: start,
+          endTime: end,
+        });
         closeModal();
-        setTaskOrder(await getTaskOrder());
-        setFixedTask(await db.fixedTask.toArray());
       }
     } else {
       // Add task
@@ -50,9 +51,8 @@ function AddTask() {
       } else if (timeTaken <= 0) {
         // timeTaken error
       } else {
-        await db.task.add({ taskName, deadline: start, timeTaken });
+        addTask({ id: makeUUID(), taskName, deadline: start, timeTaken });
         closeModal();
-        setTaskOrder(await getTaskOrder());
       }
     }
   };
@@ -117,7 +117,8 @@ function AddTask() {
         />
         <div css={timeCSS}>
           <p className="indicator">
-            {start.toLocaleDateString()} {start.toLocaleTimeString()} {isFixed ? "부터" : "까지"}
+            {start.toLocaleDateString()} {start.toLocaleTimeString()}{" "}
+            {isFixed ? "부터" : "까지"}
           </p>
           <TimeSelector
             onChange={(hour, minute) => timeHandler(hour, minute, "start")}
@@ -126,7 +127,11 @@ function AddTask() {
           />
         </div>
         {isFixed ? (
-          <motion.div css={timeCSS} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+          <motion.div
+            css={timeCSS}
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
             <p className="indicator">
               {end.toLocaleDateString()} {end.toLocaleTimeString()} 까지
             </p>
@@ -138,7 +143,11 @@ function AddTask() {
           </motion.div>
         ) : null}
         {!isFixed ? (
-          <motion.div css={timeCSS} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+          <motion.div
+            css={timeCSS}
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
             <p className="indicator">
               소요시간 {dayjs.duration(timeTaken, "minutes").hours()}시간{" "}
               {dayjs.duration(timeTaken, "minutes").minutes()}분 예상
@@ -147,7 +156,9 @@ function AddTask() {
               hour={dayjs.duration(timeTaken, "minutes").hours()}
               minute={dayjs.duration(timeTaken, "minutes").minutes()}
               onChange={(h, m) => {
-                setTimeTaken(dayjs.duration(h, "hours").add(m, "minutes").asMinutes());
+                setTimeTaken(
+                  dayjs.duration(h, "hours").add(m, "minutes").asMinutes()
+                );
               }}
             />
           </motion.div>

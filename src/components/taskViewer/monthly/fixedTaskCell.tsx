@@ -1,38 +1,50 @@
-import { IDBFixedTask } from "@/db";
 import { useDataStore } from "@/store";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { useMemo } from "react";
 import { css } from "@emotion/react";
 import { bgDark, textRed } from "@/styles/color";
+import { IFixedTask } from "@/types";
 
 dayjs.extend(isBetween);
 
 interface IFixedTaskCell {
   left: number;
   width: number;
-  data: IDBFixedTask;
+  data: IFixedTask;
 }
 
 interface IProps {
   date: Date;
-  onHover?: (fixedTask: IDBFixedTask) => void;
+  onHover?: (fixedTask: IFixedTask) => void;
   onLeave?: () => void;
 }
 
 function FixedTaskCell(props: IProps) {
-  const fixedTask = useDataStore((state) => state.fixedTask);
+  const { fixedTasks } = useDataStore();
 
-  const fixedTasks = useMemo(() => {
-    return fixedTask
-      .filter((task) => dayjs(props.date).isBetween(task.startTime, task.endTime, "day", "[]"))
+  const fixedTaskCells = useMemo(() => {
+    return fixedTasks
+      .filter((task) =>
+        dayjs(props.date).isBetween(task.startTime, task.endTime, "day", "[]")
+      )
       .map<IFixedTaskCell>((task) => {
         const start = Math.max(
-          (dayjs(task.startTime).diff(dayjs(props.date).startOf("day"), "minute") / 1440) * 100,
+          (dayjs(task.startTime).diff(
+            dayjs(props.date).startOf("day"),
+            "minute"
+          ) /
+            1440) *
+            100,
           0
         );
         const end = Math.min(
-          (dayjs(task.endTime).diff(dayjs(props.date).startOf("day"), "minute") / 1440) * 100,
+          (dayjs(task.endTime).diff(
+            dayjs(props.date).startOf("day"),
+            "minute"
+          ) /
+            1440) *
+            100,
           100
         );
         return {
@@ -41,7 +53,7 @@ function FixedTaskCell(props: IProps) {
           data: task,
         };
       });
-  }, [fixedTask, props.date]);
+  }, [fixedTasks, props.date]);
 
   const hoverHandler = async (task: IFixedTaskCell) => {
     if (props.onHover) props.onHover(task.data);
@@ -49,7 +61,7 @@ function FixedTaskCell(props: IProps) {
 
   return (
     <div css={fixedTaskCellCSS}>
-      {fixedTasks.map((task, i) => {
+      {fixedTaskCells.map((task, i) => {
         return (
           <div
             css={fixedTaskCSS}

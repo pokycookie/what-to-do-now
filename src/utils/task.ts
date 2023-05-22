@@ -1,20 +1,17 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import db from "../db";
+import { IFixedTask, ITask, ITaskOrder } from "@/types";
 
 dayjs.extend(isBetween);
 
-export interface ITaskOrder {
-  id: number;
-  taskName: string;
-  startTime: Date;
-  endTime: Date;
-}
-
-export async function getTaskOrder() {
-  const tasks = await db.task.orderBy("deadline").toArray();
-  const fixedTasks = await db.fixedTask.orderBy("startTime").toArray();
+export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
   const result: ITaskOrder[] = [];
+
+  const tasks = [...taskArr];
+  const fixedTasks = [...fixedTaskArr];
+
+  tasks.sort((a, b) => dayjs(a.deadline).diff(b.deadline));
+  fixedTasks.sort((a, b) => dayjs(a.startTime).diff(b.startTime));
 
   let task = tasks.pop();
   let fixedTask = fixedTasks.pop();
@@ -30,7 +27,9 @@ export async function getTaskOrder() {
     } else {
       endTime = task.deadline;
     }
-    const startTime = dayjs(endTime).subtract(task.timeTaken, "minute").toDate();
+    const startTime = dayjs(endTime)
+      .subtract(task.timeTaken, "minute")
+      .toDate();
     const id = task.id!;
     const taskName = task.taskName;
 
@@ -63,7 +62,12 @@ export async function getTaskOrder() {
       currentTime = startTime;
     } else if (backOverlap) {
       // overlap back
-      task = { id, taskName, timeTaken: task.timeTaken, deadline: fixedTask.startTime };
+      task = {
+        id,
+        taskName,
+        timeTaken: task.timeTaken,
+        deadline: fixedTask.startTime,
+      };
       fixedTask = fixedTasks.pop();
     } else if (frontOverlap) {
       // overlap front

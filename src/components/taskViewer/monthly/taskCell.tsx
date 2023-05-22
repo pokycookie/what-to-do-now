@@ -2,10 +2,9 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { useMemo } from "react";
 import { css } from "@emotion/react";
-import { ITaskOrder } from "@/utils";
-import db, { IDBTask } from "@/db";
 import { useDataStore } from "@/store";
 import { bgDark, textBlue } from "@/styles/color";
+import { ITask, ITaskOrder } from "@/types";
 
 dayjs.extend(isBetween);
 
@@ -17,23 +16,35 @@ interface ITaskCell {
 
 interface IProps {
   date: Date;
-  onHover?: (origin: IDBTask, taskOrder: ITaskOrder) => void;
+  onHover?: (origin: ITask, taskOrder: ITaskOrder) => void;
   onLeave?: () => void;
 }
 
 function TaskCell(props: IProps) {
-  const taskOrder = useDataStore((state) => state.taskOrder);
+  const { taskOrders, tasks } = useDataStore();
 
-  const taskOrders = useMemo(() => {
-    return taskOrder
-      .filter((task) => dayjs(props.date).isBetween(task.startTime, task.endTime, "day", "[]"))
+  const taskCells = useMemo(() => {
+    return taskOrders
+      .filter((task) =>
+        dayjs(props.date).isBetween(task.startTime, task.endTime, "day", "[]")
+      )
       .map<ITaskCell>((task) => {
         const start = Math.max(
-          (dayjs(task.startTime).diff(dayjs(props.date).startOf("day"), "minute") / 1440) * 100,
+          (dayjs(task.startTime).diff(
+            dayjs(props.date).startOf("day"),
+            "minute"
+          ) /
+            1440) *
+            100,
           0
         );
         const end = Math.min(
-          (dayjs(task.endTime).diff(dayjs(props.date).startOf("day"), "minute") / 1440) * 100,
+          (dayjs(task.endTime).diff(
+            dayjs(props.date).startOf("day"),
+            "minute"
+          ) /
+            1440) *
+            100,
           100
         );
         return {
@@ -42,18 +53,18 @@ function TaskCell(props: IProps) {
           data: task,
         };
       });
-  }, [props.date, taskOrder]);
+  }, [props.date, taskOrders]);
 
   const hoverHandler = async (task: ITaskCell) => {
     if (props.onHover) {
-      const origin = await db.task.get(task.data.id);
+      const origin = tasks.find((e) => e.id === task.data.id);
       if (origin) props.onHover(origin, task.data);
     }
   };
 
   return (
     <div css={taskCellCSS}>
-      {taskOrders.map((task, i) => {
+      {taskCells.map((task, i) => {
         return (
           <div
             css={taskCSS}

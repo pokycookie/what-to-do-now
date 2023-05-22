@@ -11,19 +11,19 @@ import { useEffect, useState } from "react";
 import TaskCell from "./taskCell";
 import FixedTaskCell from "./fixedTaskCell";
 import { motion } from "framer-motion";
-import { IDBFixedTask, IDBTask } from "@/db";
-import { ITaskOrder, getDoubleDigit } from "@/utils";
+import { getDoubleDigit } from "@/utils";
 import { ICalendar, dailyArr } from "../../calendar/core";
 import { css, SerializedStyles } from "@emotion/react";
 import { bgDark, textBlue, textRed } from "@/styles/color";
+import { IFixedTask, ITask, ITaskOrder } from "@/types";
 
 dayjs.extend(isBetween);
 
 const dayArr = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 interface IProps {
-  onTask?: (origin: IDBTask, taskOrder: ITaskOrder) => void;
-  onFixedTask?: (fixedTask: IDBFixedTask) => void;
+  onTask?: (origin: ITask, taskOrder: ITaskOrder) => void;
+  onFixedTask?: (fixedTask: IFixedTask) => void;
   onLeave?: () => void;
 }
 
@@ -95,7 +95,7 @@ function MonthlyViewer(props: IProps) {
     setMonth(tmpMonth);
   };
 
-  const onTask = (origin: IDBTask, taskOrder: ITaskOrder, index: number) => {
+  const onTask = (origin: ITask, taskOrder: ITaskOrder, index: number) => {
     if (props.onTask) props.onTask(origin, taskOrder);
     setSelected({
       type: "task",
@@ -106,7 +106,7 @@ function MonthlyViewer(props: IProps) {
     });
   };
 
-  const onFixedTask = (fixedTask: IDBFixedTask, index: number) => {
+  const onFixedTask = (fixedTask: IFixedTask, index: number) => {
     if (props.onFixedTask) props.onFixedTask(fixedTask);
     setSelected({
       type: "fixedTask",
@@ -135,7 +135,10 @@ function MonthlyViewer(props: IProps) {
         <button css={navBtnCSS} onClick={() => monthHadler(-1)}>
           <FontAwesomeIcon icon={faAngleLeft} />
         </button>
-        <button css={[navBtnCSS, { width: "100%", fontWeight: 600 }]} onClick={setToday}>
+        <button
+          css={[navBtnCSS, { width: "100%", fontWeight: 600 }]}
+          onClick={setToday}
+        >
           {year}.{getDoubleDigit(month + 1)}
         </button>
         <button css={navBtnCSS} onClick={() => monthHadler(1)}>
@@ -173,7 +176,12 @@ function MonthlyViewer(props: IProps) {
                     animate={{ y: 0, opacity: 1 }}
                   >
                     <p
-                      css={[taskNameCSS, { color: selected.type === "task" ? textBlue : textRed }]}
+                      css={[
+                        taskNameCSS,
+                        {
+                          color: selected.type === "task" ? textBlue : textRed,
+                        },
+                      ]}
                     >
                       {selected.taskName}
                     </p>
