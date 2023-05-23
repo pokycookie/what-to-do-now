@@ -3,7 +3,6 @@ interface IProps {
   endDeg: number;
   size?: number;
   holeSize?: number;
-  overlay?: boolean;
   color?: string;
   strokeWidth?: number;
   onMouseEnter?: () => void;
@@ -20,11 +19,26 @@ function SvgArc(props: IProps) {
   const outer = ((props.size ?? 100) - strokeWidth) * (clipPathSize / 200);
   const inner = ((props.holeSize ?? 80) + strokeWidth) * (clipPathSize / 200);
 
-  const start = getPos(props.startDeg, outer, clipPathSize / 2, clipPathSize / 2);
+  const start = getPos(
+    props.startDeg,
+    outer,
+    clipPathSize / 2,
+    clipPathSize / 2
+  );
   const end = getPos(props.endDeg, outer, clipPathSize / 2, clipPathSize / 2);
 
-  const innerStart = getPos(props.startDeg, inner, clipPathSize / 2, clipPathSize / 2);
-  const innerEnd = getPos(props.endDeg, inner, clipPathSize / 2, clipPathSize / 2);
+  const innerStart = getPos(
+    props.startDeg,
+    inner,
+    clipPathSize / 2,
+    clipPathSize / 2
+  );
+  const innerEnd = getPos(
+    props.endDeg,
+    inner,
+    clipPathSize / 2,
+    clipPathSize / 2
+  );
 
   const startDeg = props.startDeg;
   const endDeg = props.endDeg < startDeg ? props.endDeg + 360 : props.endDeg;

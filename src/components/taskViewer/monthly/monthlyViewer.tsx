@@ -186,8 +186,8 @@ function MonthlyViewer(props: IProps) {
                       {selected.taskName}
                     </p>
                     <p css={taskTimeCSS}>
-                      {selected.startTime.toLocaleTimeString()} ~{" "}
-                      {selected.endTime.toLocaleTimeString()}
+                      {dayjs(selected.startTime).format("HH:mm")} ~{" "}
+                      {dayjs(selected.endTime).format("HH:mm")}
                     </p>
                   </motion.div>
                 </div>
@@ -298,7 +298,6 @@ const toolTipAreaCSS = css({
 
 const toolTipCSS = css({
   width: "100%",
-  height: "60px",
 
   position: "absolute",
   top: "-70px",

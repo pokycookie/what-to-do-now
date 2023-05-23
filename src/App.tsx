@@ -72,18 +72,20 @@ export default function App() {
   useInterval(() => {
     const now = new Date();
 
+    const sortedTasks = [...tasks];
+    sortedTasks.sort((a, b) => dayjs(a.deadline).diff(b.deadline));
+
     for (let i = 0; i < tasks.length; i++) {
-      if (dayjs(tasks[i].deadline).isBefore(now, "minute")) {
-        delTask(tasks[i].id);
-        addPastTask({ ...tasks[i], success: false });
+      if (dayjs(sortedTasks[i].deadline).isBefore(now, "minute")) {
+        delTask(sortedTasks[i].id);
+        addPastTask({ ...sortedTasks[i], success: false });
       } else {
         break;
       }
     }
 
-    // getTaskOrder가 1분마다 반복되는 부분 개선 필요
-    setTaskOrder(getTaskOrder(tasks, fixedTasks));
     updateCurrentTime();
+    console.log(now);
   }, 30000);
 
   return (

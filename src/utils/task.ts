@@ -81,5 +81,6 @@ export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
     }
   }
 
+  console.log(result);
   return result;
 }

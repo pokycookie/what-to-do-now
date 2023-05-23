@@ -1,3 +1,5 @@
+type TTask = "task" | "fixedTask";
+
 interface ITask {
   id: string;
   taskName: string;
@@ -23,4 +25,4 @@ interface IPastTask extends ITask {
   success: boolean;
 }
 
-export type { ITask, IFixedTask, ITaskOrder, IPastTask };
+export type { ITask, IFixedTask, ITaskOrder, IPastTask, TTask };
