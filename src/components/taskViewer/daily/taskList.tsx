@@ -2,12 +2,12 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useState, useEffect } from "react";
-import { ITaskOrder, getTaskOrder } from "@/utils";
+import { getTaskOrder, makeUUID } from "@/utils";
 import { useDataStore } from "@/store";
-import db from "@/db";
 import { css } from "@emotion/react";
 import { textOverflowCSS } from "@/styles/component";
 import { bgGrey } from "@/styles/color";
+import { ITaskOrder } from "@/types";
 
 dayjs.extend(relativeTime);
 
@@ -17,27 +17,28 @@ function TaskList(props: IProps) {
   const [index, setIndex] = useState(0);
   const [task, setTask] = useState<ITaskOrder[]>([]);
 
-  const taskOrder = useDataStore((state) => state.taskOrder);
-  const setTaskOrder = useDataStore((state) => state.setTaskOrder);
+  const { tasks, fixedTasks, taskOrders, setTaskOrder, delTask, addPastTask } =
+    useDataStore();
 
-  const checkHandler = async (check: boolean, task: ITaskOrder) => {
-    const tmpTask = await db.task.get(task.id);
-    if (check && tmpTask) {
-      await db.task.delete(task.id);
-      await db.pastTask.add({
-        taskName: tmpTask.taskName,
-        deadline: tmpTask.deadline,
-        timeTaken: tmpTask.timeTaken,
+  const checkHandler = (check: boolean, task: ITaskOrder) => {
+    const selectedTask = tasks.find((e) => e.id === task.id);
+    if (check && selectedTask) {
+      delTask(task.id);
+      addPastTask({
+        id: makeUUID(),
+        taskName: selectedTask.taskName,
+        deadline: selectedTask.deadline,
+        timeTaken: selectedTask.timeTaken,
         success: true,
       });
-      const tmpTaskOrder = await getTaskOrder();
+      const tmpTaskOrder = getTaskOrder(tasks, fixedTasks);
       setTimeout(() => {
         setTaskOrder(tmpTaskOrder);
       }, 500);
     }
   };
 
-  const wheelHandler = (e: React.WheelEvent<HTMLUListElement>) => {
+  const wheelHandler = (e: React.WheelEvent<HTMLDivElement>) => {
     if (e.deltaY > 0) {
       // wheel down
       const tmpIndex = Math.min(task.length - 1, index + 1);
@@ -50,14 +51,14 @@ function TaskList(props: IProps) {
   };
 
   useEffect(() => {
-    setTask([...taskOrder].reverse());
-    setIndex((prev) => Math.min(prev, taskOrder.length - 1));
-  }, [taskOrder]);
+    setTask([...taskOrders].reverse());
+    setIndex((prev) => Math.min(prev, taskOrders.length - 1));
+  }, [taskOrders]);
 
   return (
-    <ul css={taskListCSS} onWheel={wheelHandler}>
-      {task.length > 0 ? (
-        <li css={taskItemCSS} key={task[index].id}>
+    <div onWheel={wheelHandler}>
+      {task.length > 0 && task[index] ? (
+        <span css={taskItemCSS} key={task[index]?.id}>
           {/* <button onClick={() => setIndex(Math.max(0, index - 1))}>
             <FontAwesomeIcon icon={faAngleUp} />
           </button> */}
@@ -66,36 +67,46 @@ function TaskList(props: IProps) {
           </div> */}
 
           <p css={[taskNameCSS, textOverflowCSS]}>{task[index]?.taskName}</p>
-          <p css={fromNowCSS}>{dayjs(task[index].endTime).locale("ko").fromNow()} 마감</p>
+          <p css={fromNowCSS}>
+            {dayjs(task[index]?.endTime).locale("ko").fromNow()} 마감
+          </p>
 
           {/* <button onClick={() => setIndex(Math.min(task.length - 1, index + 1))}>
             <FontAwesomeIcon icon={faAngleDown} />
           </button> */}
-        </li>
+        </span>
       ) : (
-        <li css={taskItemCSS}>
+        <span css={taskItemCSS}>
           <p className="taskName">할 일이 없어요!</p>
-        </li>
+        </span>
       )}
-    </ul>
+    </div>
   );
 }
 
-const taskListCSS = css({
-  userSelect: "none",
-});
-
 const taskItemCSS = css({
+  width: "350px",
   boxSizing: "border-box",
   padding: "10px",
+  borderRadius: "5px",
 
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  gap: "5px",
+  gap: "10px",
 
-  transition: "background-color 0.3s",
+  transition: "background-color 0.3s, box-shadow 0.3s",
+  userSelect: "none",
+
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+
+  ":hover": {
+    boxShadow:
+      "0px 6px 10px 0px rgba(0, 0, 0, 0.15), 0px 0px 15px 0px rgba(0, 0, 0, 0.1), 0px 3px 5px -1px rgba(0, 0, 0, 0.25)",
+  },
 });
 
 const taskNameCSS = css({
