@@ -13,11 +13,9 @@ import { getDailyArc } from "@/utils";
 import { textOverflowCSS } from "@/styles/component";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleMinus,
-  faCircleCheck,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleMinus, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import IndexIndicator from "./indexIndicator";
+import { Marquee } from "@/components/marquee";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
@@ -25,6 +23,7 @@ dayjs.extend(relativeTime);
 function DailyViewer() {
   const [selected, setSelected] = useState<IDailyArc | null>(null);
   const [taskIndex, setTaskIndex] = useState(0);
+  const [isHover, setIsHover] = useState(false);
 
   const { currentTime } = useAppDataStore();
   const { taskOrders, fixedTasks } = useDataStore();
@@ -41,9 +40,7 @@ function DailyViewer() {
   }, [dateMemo, taskOrders, fixedTasks]);
 
   const currentTimeDegree =
-    (dayjs(currentTime).diff(dayjs(currentTime).startOf("day"), "minute") /
-      1440) *
-    360;
+    (dayjs(currentTime).diff(dayjs(currentTime).startOf("day"), "minute") / 1440) * 360;
 
   const wheelHandler = (e: React.WheelEvent<HTMLDivElement>) => {
     if (cooltime.current) return;
@@ -57,7 +54,7 @@ function DailyViewer() {
       setTaskIndex(tmpIndex);
     }
     cooltime.current = true;
-    setTimeout(() => (cooltime.current = false), 500);
+    setTimeout(() => (cooltime.current = false), 400);
   };
 
   useEffect(() => {
@@ -70,13 +67,7 @@ function DailyViewer() {
     <div css={dailyViewerCSS} onWheel={wheelHandler}>
       <SvgDonut color="#2c3333" holeSize={85} overlay />
       <svg viewBox="0 0 200 200" css={{ position: "absolute" }}>
-        <SvgArc
-          startDeg={0}
-          endDeg={currentTimeDegree}
-          size={89}
-          holeSize={87}
-          color="#FF6000"
-        />
+        <SvgArc startDeg={0} endDeg={currentTimeDegree} size={89} holeSize={87} color="#FF6000" />
         {dailyArc.map((task, i) => {
           return (
             <SvgArc
@@ -93,31 +84,48 @@ function DailyViewer() {
         })}
       </svg>
       <div css={indexIndicatorAreaCSS}>
-        <IndexIndicator
-          index={taskIndex}
-          length={taskOrders.length}
-          setIndex={setTaskIndex}
-        />
+        <IndexIndicator index={taskIndex} length={taskOrders.length} setIndex={setTaskIndex} />
       </div>
-      <div css={[indicatorCSS, textOverflowCSS]}>
-        <motion.ul css={taskAreaCSS} animate={{ top: -67 * taskIndex }}>
-          {[...taskOrders].reverse().map((task, i) => {
-            return (
-              <li key={i} css={[selectedTaskCSS]}>
-                <p css={taskNameCSS}>{task.taskName}</p>
-                <p css={taskTimeCSS}>
-                  {`${dayjs(task.endTime).locale("ko").fromNow()} 마감`}
-                </p>
-              </li>
-            );
-          })}
-        </motion.ul>
-        <button css={[taskBtnCSS, successBtnCSS, { left: 0 }]}>
-          <FontAwesomeIcon icon={faCircleCheck} />
-        </button>
-        <button css={[taskBtnCSS, failBtnCSS, { right: 0 }]}>
-          <FontAwesomeIcon icon={faCircleMinus} />
-        </button>
+      <div css={indicatorCSS}>
+        {taskOrders.length > 0 ? (
+          <motion.ul css={taskAreaCSS} animate={{ top: -67 * taskIndex }}>
+            {[...taskOrders].reverse().map((task, i) => {
+              return (
+                <li
+                  key={i}
+                  css={selectedTaskCSS}
+                  onMouseEnter={() => setIsHover(true)}
+                  onMouseLeave={() => setIsHover(false)}
+                >
+                  <Marquee emotion={taskNameCSS} animate={isHover && i === taskIndex}>
+                    {task.taskName}
+                  </Marquee>
+                  <p css={taskTimeCSS}>{`${dayjs(task.endTime).locale("ko").fromNow()} 마감`}</p>
+                </li>
+              );
+            })}
+          </motion.ul>
+        ) : (
+          <p css={noTaskCSS}>할 일이 없어요!</p>
+        )}
+        {taskOrders.length > 0 ? (
+          <>
+            <button
+              css={[taskBtnCSS, successBtnCSS, { left: 0 }]}
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
+            >
+              <FontAwesomeIcon icon={faCircleCheck} />
+            </button>
+            <button
+              css={[taskBtnCSS, failBtnCSS, { right: 0 }]}
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
+            >
+              <FontAwesomeIcon icon={faCircleMinus} />
+            </button>
+          </>
+        ) : null}
       </div>
     </div>
   );
@@ -154,6 +162,7 @@ const selectedTaskCSS = css({
   alignItems: "center",
   gap: "10px",
 
+  height: "47px",
   padding: "10px",
   position: "relative",
 });
@@ -161,7 +170,6 @@ const selectedTaskCSS = css({
 const taskNameCSS = css({
   fontSize: "24px",
   fontWeight: 600,
-  textAlign: "center",
 });
 
 const taskTimeCSS = css({
@@ -178,7 +186,7 @@ const taskAreaCSS = css({
 
 const taskBtnCSS = css({
   position: "absolute",
-  width: "40%",
+  width: "35%",
   height: "67px",
 
   opacity: 0,
@@ -217,6 +225,17 @@ const indexIndicatorAreaCSS = css({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+});
+
+const noTaskCSS = css({
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+
+  fontSize: "18px",
+  fontWeight: 500,
 });
 
 export default DailyViewer;

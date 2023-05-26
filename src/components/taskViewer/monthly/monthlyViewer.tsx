@@ -16,6 +16,7 @@ import { ICalendar, dailyArr } from "../../calendar/core";
 import { css, SerializedStyles } from "@emotion/react";
 import { bgDark, textBlue, textRed } from "@/styles/color";
 import { IFixedTask, ITask, ITaskOrder } from "@/types";
+import { Marquee } from "@/components/marquee";
 
 dayjs.extend(isBetween);
 
@@ -135,10 +136,7 @@ function MonthlyViewer(props: IProps) {
         <button css={navBtnCSS} onClick={() => monthHadler(-1)}>
           <FontAwesomeIcon icon={faAngleLeft} />
         </button>
-        <button
-          css={[navBtnCSS, { width: "100%", fontWeight: 600 }]}
-          onClick={setToday}
-        >
+        <button css={[navBtnCSS, { width: "100%", fontWeight: 600 }]} onClick={setToday}>
           {year}.{getDoubleDigit(month + 1)}
         </button>
         <button css={navBtnCSS} onClick={() => monthHadler(1)}>
@@ -175,16 +173,16 @@ function MonthlyViewer(props: IProps) {
                     initial={{ y: 30, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                   >
-                    <p
-                      css={[
+                    <Marquee
+                      emotion={[
                         taskNameCSS,
-                        {
-                          color: selected.type === "task" ? textBlue : textRed,
-                        },
+                        { color: selected.type === "task" ? textBlue : textRed },
                       ]}
+                      animate
+                      speed={0.5}
                     >
                       {selected.taskName}
-                    </p>
+                    </Marquee>
                     <p css={taskTimeCSS}>
                       {dayjs(selected.startTime).format("HH:mm")} ~{" "}
                       {dayjs(selected.endTime).format("HH:mm")}
@@ -298,15 +296,16 @@ const toolTipAreaCSS = css({
 
 const toolTipCSS = css({
   width: "100%",
+  height: "50px",
 
   position: "absolute",
-  top: "-70px",
+  top: "-55px",
   left: 0,
 
   display: "flex",
   flexDirection: "column",
-  justifyContent: "flex-start",
-  alignItems: "flex-start",
+  justifyContent: "space-between",
+  alignItems: "center",
 
   backgroundColor: bgDark,
   color: "white",
@@ -317,12 +316,10 @@ const toolTipCSS = css({
 
   pointerEvents: "none",
   zIndex: 99,
+  overflow: "hidden",
 });
 
 const taskNameCSS = css({
-  width: "100%",
-  marginBottom: "5px",
-
   fontSize: "13px",
   fontWeight: 500,
 });
