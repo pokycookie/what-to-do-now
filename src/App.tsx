@@ -13,18 +13,30 @@ export default function App() {
   const initLoaded = useRef(false);
 
   const { updateCurrentTime } = useAppDataStore();
-  const {
-    setTask,
-    setFixedTask,
-    setPastTask,
-    setTaskOrder,
-    delTask,
-    addPastTask,
-    tasks,
-    fixedTasks,
-    pastTasks,
-  } = useDataStore();
+  const dataStore = useDataStore();
+  const { tasks, fixedTasks, pastTasks } = useDataStore();
 
+  // Update tasks and pastTasks with deadline
+  const updateDeadline = () => {
+    const now = new Date();
+
+    const sortedTasks = [...tasks];
+    sortedTasks.sort((a, b) => dayjs(a.deadline).diff(b.deadline));
+
+    for (let i = 0; i < tasks.length; i++) {
+      if (dayjs(sortedTasks[i].deadline).isBefore(now, "minute")) {
+        dataStore.delTask(sortedTasks[i].id);
+        dataStore.addPastTask({ ...sortedTasks[i], success: false });
+      } else {
+        break;
+      }
+    }
+
+    updateCurrentTime();
+    console.log(now);
+  };
+
+  // Load fileData
   useEffect(() => {
     const init = async () => {
       const electron = window.require("electron");
@@ -34,23 +46,23 @@ export default function App() {
         const fileData = JSON.parse(args, (key, value) => {
           if (typeof value === "string") {
             const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-            if (dateRegex.test(value)) {
-              return new Date(value);
-            }
+            if (dateRegex.test(value)) return new Date(value);
           }
           return value;
         }) as IFile;
 
-        setTask(fileData.data.tasks);
-        setFixedTask(fileData.data.fixedTasks);
-        setPastTask(fileData.data.pastTasks);
+        dataStore.setTask(fileData.data.tasks);
+        dataStore.setFixedTask(fileData.data.fixedTasks);
+        dataStore.setPastTask(fileData.data.pastTasks);
 
         initLoaded.current = true;
       });
     };
     init();
-  }, [setFixedTask, setPastTask, setTask]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  // Update fileData
   useEffect(() => {
     if (initLoaded.current) {
       const electron = window.require("electron");
@@ -65,28 +77,15 @@ export default function App() {
     }
   }, [tasks, fixedTasks, pastTasks]);
 
+  // Update taskOrders
   useEffect(() => {
-    setTaskOrder(getTaskOrder(tasks, fixedTasks));
-  }, [tasks, fixedTasks, setTaskOrder]);
+    dataStore.setTaskOrder(getTaskOrder(tasks, fixedTasks));
+    updateDeadline();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fixedTasks, tasks]);
 
-  useInterval(() => {
-    const now = new Date();
-
-    const sortedTasks = [...tasks];
-    sortedTasks.sort((a, b) => dayjs(a.deadline).diff(b.deadline));
-
-    for (let i = 0; i < tasks.length; i++) {
-      if (dayjs(sortedTasks[i].deadline).isBefore(now, "minute")) {
-        delTask(sortedTasks[i].id);
-        addPastTask({ ...sortedTasks[i], success: false });
-      } else {
-        break;
-      }
-    }
-
-    updateCurrentTime();
-    console.log(now);
-  }, 30000);
+  // Time interval
+  useInterval(updateDeadline, 30000);
 
   return (
     <div className="App">

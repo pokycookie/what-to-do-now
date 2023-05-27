@@ -10,7 +10,6 @@ import SvgDonut from "@/components/svg/donut";
 import SvgArc from "@/components/svg/arc";
 import { IDailyArc } from "@/types";
 import { getDailyArc } from "@/utils";
-import { textOverflowCSS } from "@/styles/component";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleMinus, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
@@ -42,6 +41,16 @@ function DailyViewer() {
   const currentTimeDegree =
     (dayjs(currentTime).diff(dayjs(currentTime).startOf("day"), "minute") / 1440) * 360;
 
+  const doneHandler = () => {
+    const selectedTask = taskOrders[taskIndex];
+    console.log(selectedTask.taskName, selectedTask.id);
+  };
+
+  const giveupHandler = () => {
+    const selectedTask = taskOrders[taskIndex];
+    console.log(selectedTask.taskName, selectedTask.id);
+  };
+
   const wheelHandler = (e: React.WheelEvent<HTMLDivElement>) => {
     if (cooltime.current) return;
     if (e.deltaY > 0) {
@@ -56,6 +65,12 @@ function DailyViewer() {
     cooltime.current = true;
     setTimeout(() => (cooltime.current = false), 400);
   };
+
+  useEffect(() => {
+    if (taskIndex > taskOrders.length - 1) {
+      setTaskIndex(Math.max(taskOrders.length - 1, 0));
+    }
+  }, [taskIndex, taskOrders]);
 
   useEffect(() => {
     if (!dayjs(currentTime).isSame(dateMemo.current, "day")) {
@@ -114,6 +129,7 @@ function DailyViewer() {
               css={[taskBtnCSS, successBtnCSS, { left: 0 }]}
               onMouseEnter={() => setIsHover(true)}
               onMouseLeave={() => setIsHover(false)}
+              onClick={doneHandler}
             >
               <FontAwesomeIcon icon={faCircleCheck} />
             </button>
@@ -121,6 +137,7 @@ function DailyViewer() {
               css={[taskBtnCSS, failBtnCSS, { right: 0 }]}
               onMouseEnter={() => setIsHover(true)}
               onMouseLeave={() => setIsHover(false)}
+              onClick={giveupHandler}
             >
               <FontAwesomeIcon icon={faCircleMinus} />
             </button>
