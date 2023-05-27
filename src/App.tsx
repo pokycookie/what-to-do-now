@@ -9,6 +9,7 @@ import { getTaskOrder } from "./utils";
 import { useInterval } from "./hooks";
 import dayjs from "dayjs";
 import Toast from "./components/toast";
+import Page from "./components/page";
 
 export default function App() {
   const initLoaded = useRef(false);
@@ -91,7 +92,7 @@ export default function App() {
   return (
     <div className="App">
       <Nav />
-      <Main />
+      <Page />
       <ModalIndex />
       <Toast />
     </div>

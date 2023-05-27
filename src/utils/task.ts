@@ -27,9 +27,7 @@ export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
     } else {
       endTime = task.deadline;
     }
-    const startTime = dayjs(endTime)
-      .subtract(task.timeTaken, "minute")
-      .toDate();
+    const startTime = dayjs(endTime).subtract(task.timeTaken, "minute").toDate();
     const id = task.id!;
     const taskName = task.taskName;
 
@@ -81,6 +79,9 @@ export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
     }
   }
 
+  console.group("utils > task");
+  console.info("getTaskOrders");
   console.log(result);
+  console.groupEnd();
   return result;
 }

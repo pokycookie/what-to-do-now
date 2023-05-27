@@ -1,10 +1,12 @@
-import { faArrowLeft, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faBars, faDatabase } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Variants, motion } from "framer-motion";
 import { useState } from "react";
 import { css } from "@emotion/react";
 import ViewerSelector from "../taskViewer/viewerSelector";
-import { bgDark } from "@/styles/color";
+import { bgDark, textOrange } from "@/styles/color";
+import styled from "@emotion/styled";
+import NavBtn from "./navBtn";
 
 const variants: Variants = {
   open: { width: 270 },
@@ -16,14 +18,17 @@ function Nav() {
 
   return (
     <motion.nav css={navCSS} animate={isExtend ? "open" : "close"} variants={variants}>
-      <div css={{ width: "100%" }}>
+      <NavArea>
         <button css={extendBtnCSS} onClick={() => setIsExtend(!isExtend)}>
           <FontAwesomeIcon icon={isExtend ? faArrowLeft : faBars} />
         </button>
-        <div css={dividerCSS} />
+        <Divider />
         <ViewerSelector miniSize />
-        <div css={dividerCSS} />
-      </div>
+        <Divider />
+        <NavBtn page="database">
+          <FontAwesomeIcon icon={faDatabase} />
+        </NavBtn>
+      </NavArea>
       <div css={{ width: "100%" }}>
         {/* <button className="addBtn">
           <FontAwesomeIcon icon={faAdd} />
@@ -46,11 +51,6 @@ const navCSS = css({
   alignItems: "center",
 });
 
-const dividerCSS = css({
-  borderBottom: `1px solid ${bgDark}`,
-  margin: "5px 0px",
-});
-
 const extendBtnCSS = css({
   width: "40px",
   height: "40px",
@@ -71,5 +71,20 @@ const extendBtnCSS = css({
     backgroundColor: "hsl(0, 0%, 95%)",
   },
 });
+
+const Divider = styled.div(() => ({
+  width: "100%",
+  borderTop: `1px solid ${bgDark}`,
+}));
+
+const NavArea = styled.div(() => ({
+  width: "100%",
+
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "flex-start",
+  gap: "5px",
+}));
 
 export default Nav;
