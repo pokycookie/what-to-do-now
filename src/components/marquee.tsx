@@ -57,7 +57,7 @@ export function Marquee(props: IProps) {
   }, []);
 
   return (
-    <Container ref={containerREF}>
+    <Container ref={containerREF} css={{ opacity: didMount ? 1 : 0 }}>
       <motion.span
         ref={textREF}
         css={[props.emotion, marqueeTextCSS]}

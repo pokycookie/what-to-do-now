@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ko";
-import { useAppDataStore, useDataStore } from "@/store";
+import { useAppDataStore, useDataStore, useToastStore } from "@/store";
 import { css } from "@emotion/react";
 import { bgDark, bgWhite, textBlue, textRed } from "@/styles/color";
 import SvgDonut from "@/components/svg/donut";
@@ -26,6 +26,7 @@ function DailyViewer() {
 
   const { currentTime } = useAppDataStore();
   const { taskOrders, fixedTasks } = useDataStore();
+  const addMessage = useToastStore((state) => state.addMessage);
 
   const dateMemo = useRef(currentTime);
   const cooltime = useRef(false);
@@ -43,12 +44,18 @@ function DailyViewer() {
 
   const doneHandler = () => {
     const selectedTask = taskOrders[taskIndex];
+    addMessage(`${selectedTask.taskName}, ${selectedTask.id}`, "success");
     console.log(selectedTask.taskName, selectedTask.id);
   };
 
   const giveupHandler = () => {
     const selectedTask = taskOrders[taskIndex];
+    addMessage(`${selectedTask.taskName}, ${selectedTask.id}`, "warning");
     console.log(selectedTask.taskName, selectedTask.id);
+  };
+
+  const clickHandler = (task: IDailyArc) => {
+    console.log(task);
   };
 
   const wheelHandler = (e: React.WheelEvent<HTMLDivElement>) => {
@@ -90,10 +97,12 @@ function DailyViewer() {
               startDeg={task.startDeg}
               endDeg={task.endDeg}
               color={task.type === "task" ? "#0096ff" : "#eb1d36"}
+              hoverColor={task.type === "task" ? "#4CB4FF" : "#F05A6C"}
               strokeWidth={1}
               holeSize={90}
               onMouseEnter={() => setSelected(task)}
               onMouseLeave={() => setSelected(null)}
+              onClick={() => clickHandler(task)}
             />
           );
         })}
@@ -144,6 +153,14 @@ function DailyViewer() {
           </>
         ) : null}
       </div>
+      {selected ? (
+        <div css={selectedTaskAreaCSS}>
+          <Marquee emotion={taskNameCSS} animate>
+            {selected.taskName}
+          </Marquee>
+          <p css={taskTimeCSS}>{`${dayjs(selected.endTime).locale("ko").fromNow()} 마감`}</p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -253,6 +270,24 @@ const noTaskCSS = css({
 
   fontSize: "18px",
   fontWeight: 500,
+});
+
+const selectedTaskAreaCSS = css({
+  width: "350px",
+  height: "67px",
+  position: "absolute",
+
+  padding: "10px",
+  borderRadius: "5px",
+
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "10px",
+
+  backgroundColor: "white",
+  boxSizing: "border-box",
 });
 
 export default DailyViewer;

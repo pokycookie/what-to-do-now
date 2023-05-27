@@ -8,6 +8,7 @@ import { IFile } from "./types";
 import { getTaskOrder } from "./utils";
 import { useInterval } from "./hooks";
 import dayjs from "dayjs";
+import Toast from "./components/toast";
 
 export default function App() {
   const initLoaded = useRef(false);
@@ -92,6 +93,7 @@ export default function App() {
       <Nav />
       <Main />
       <ModalIndex />
+      <Toast />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { TTask } from "./task";
 
 interface IDailyArc {
+  id: string;
   taskName: string;
   type: TTask;
   startTime: Date;
