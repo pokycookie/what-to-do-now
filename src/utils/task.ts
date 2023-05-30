@@ -10,20 +10,27 @@ export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
   const tasks = [...taskArr];
   const fixedTasks = [...fixedTaskArr];
 
+  if (tasks.length < 1) return result;
+
   tasks.sort((a, b) => dayjs(a.deadline).diff(b.deadline));
   fixedTasks.sort((a, b) => dayjs(a.startTime).diff(b.startTime));
 
+  console.group("utils > task");
+
   let task = tasks.pop();
   let fixedTask = fixedTasks.pop();
-  let currentTime = task?.deadline!;
+  let HEAD = task?.deadline!;
 
   while (true) {
     // Break point
     if (!task) break;
 
+    console.log(task);
+    console.log(fixedTask);
+
     let endTime: Date;
-    if (dayjs(currentTime).isBefore(task.deadline)) {
-      endTime = currentTime;
+    if (dayjs(HEAD).isBefore(task.deadline)) {
+      endTime = HEAD;
     } else {
       endTime = task.deadline;
     }
@@ -35,10 +42,11 @@ export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
     if (!fixedTask) {
       result.push({ id, taskName, startTime, endTime });
       task = tasks.pop();
-      currentTime = startTime;
+      HEAD = startTime;
       continue;
     }
 
+    // Overlap flag
     const frontOverlap = dayjs(startTime).isBetween(
       fixedTask.startTime,
       fixedTask.endTime,
@@ -51,13 +59,16 @@ export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
       "minute",
       "[]"
     );
+    const allOverlap =
+      dayjs(startTime).isBefore(fixedTask.startTime) && dayjs(endTime).isAfter(fixedTask.endTime);
 
     // Others
     if (!dayjs(startTime).isBefore(fixedTask.endTime)) {
       // not overlap
       result.push({ id, taskName, startTime, endTime });
       task = tasks.pop();
-      currentTime = startTime;
+      HEAD = startTime;
+      console.info("no overlap");
     } else if (backOverlap) {
       // overlap back
       task = {
@@ -67,20 +78,27 @@ export function getTaskOrder(taskArr: ITask[], fixedTaskArr: IFixedTask[]) {
         deadline: fixedTask.startTime,
       };
       fixedTask = fixedTasks.pop();
+      console.info("overlap back");
     } else if (frontOverlap) {
       // overlap front
       const timeTaken = dayjs(fixedTask.endTime).diff(startTime, "minute");
       result.push({ id, taskName, startTime: fixedTask.endTime, endTime });
       task = { id, taskName, timeTaken, deadline: fixedTask.startTime };
-      currentTime = fixedTask.endTime;
+      HEAD = fixedTask.endTime;
+      console.info("overlap front");
+    } else if (allOverlap) {
+      // overlap all
+      const timeTaken = dayjs(fixedTask.endTime).diff(startTime, "minute");
+      result.push({ id, taskName, startTime: fixedTask.endTime, endTime });
+      task = { id, taskName, timeTaken, deadline: fixedTask.startTime };
+      HEAD = fixedTask.endTime;
+      console.info("overlap all");
     } else {
       // check other fixedTask
       fixedTask = fixedTasks.pop();
     }
   }
 
-  console.group("utils > task");
-  console.info("getTaskOrders");
   console.log(result);
   console.groupEnd();
   return result;

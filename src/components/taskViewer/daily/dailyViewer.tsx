@@ -42,14 +42,20 @@ function DailyViewer() {
   const currentTimeDegree =
     (dayjs(currentTime).diff(dayjs(currentTime).startOf("day"), "minute") / 1440) * 360;
 
+  const dailyTasks = useMemo(() => {
+    return [...taskOrders]
+      .reverse()
+      .filter((e, i, arr) => arr.findIndex((x) => x.id === e.id) === i);
+  }, [taskOrders]);
+
   const doneHandler = () => {
-    const selectedTask = taskOrders[taskIndex];
+    const selectedTask = dailyTasks[taskIndex];
     addMessage(`${selectedTask.taskName}, ${selectedTask.id}`, "success");
     console.log(selectedTask.taskName, selectedTask.id);
   };
 
   const giveupHandler = () => {
-    const selectedTask = taskOrders[taskIndex];
+    const selectedTask = dailyTasks[taskIndex];
     addMessage(`${selectedTask.taskName}, ${selectedTask.id}`, "warning");
     console.log(selectedTask.taskName, selectedTask.id);
   };
@@ -108,12 +114,12 @@ function DailyViewer() {
         })}
       </svg>
       <div css={indexIndicatorAreaCSS}>
-        <IndexIndicator index={taskIndex} length={taskOrders.length} setIndex={setTaskIndex} />
+        <IndexIndicator index={taskIndex} length={dailyTasks.length} setIndex={setTaskIndex} />
       </div>
       <div css={indicatorCSS}>
-        {taskOrders.length > 0 ? (
+        {dailyTasks.length > 0 ? (
           <motion.ul css={taskAreaCSS} animate={{ top: -67 * taskIndex }}>
-            {[...taskOrders].reverse().map((task, i) => {
+            {dailyTasks.map((task, i) => {
               return (
                 <li
                   key={i}
