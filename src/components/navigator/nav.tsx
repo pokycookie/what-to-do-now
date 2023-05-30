@@ -4,7 +4,7 @@ import { Variants, motion } from "framer-motion";
 import { useState } from "react";
 import { css } from "@emotion/react";
 import ViewerSelector from "../taskViewer/viewerSelector";
-import { bgDark, textOrange } from "@/styles/color";
+import { bgDark } from "@/styles/color";
 import styled from "@emotion/styled";
 import NavBtn from "./navBtn";
 

@@ -155,7 +155,10 @@ function DailyViewer() {
       </div>
       {selected ? (
         <div css={selectedTaskAreaCSS}>
-          <Marquee emotion={taskNameCSS} animate>
+          <Marquee
+            emotion={[taskNameCSS, { color: selected.type === "task" ? textBlue : textRed }]}
+            animate
+          >
             {selected.taskName}
           </Marquee>
           <p css={taskTimeCSS}>{`${dayjs(selected.endTime).locale("ko").fromNow()} 마감`}</p>

@@ -8,14 +8,17 @@ interface IProps {
 }
 
 function NavBtn(props: IProps) {
-  const setPage = useAppDataStore((state) => state.setPage);
+  const { page, setPage } = useAppDataStore();
 
   const clickHandler = () => {
     setPage(props.page);
   };
 
   return (
-    <button css={navBtnCSS} onClick={clickHandler}>
+    <button
+      css={[navBtnCSS, { color: page === props.page ? textOrange : bgDark }]}
+      onClick={clickHandler}
+    >
       {props.children}
     </button>
   );
@@ -26,7 +29,6 @@ const navBtnCSS = css({
   height: "40px",
 
   backgroundColor: "white",
-  color: bgDark,
 
   padding: "5px",
   border: `1px solid ${bgDark}`,
