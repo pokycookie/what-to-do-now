@@ -39,7 +39,7 @@ function Table({ taskType }: { taskType: number }) {
         <>
           {tasks.map((e) => {
             return (
-              <li css={tableListCSS}>
+              <li css={tableListCSS} key={e.id}>
                 <p css={textOverflowCSS}>{e.taskName}</p>
                 <p>{dayjs(e.deadline).format("YYYY-MM-DD HH:mm:ss")}</p>
                 <p>{e.timeTaken}</p>

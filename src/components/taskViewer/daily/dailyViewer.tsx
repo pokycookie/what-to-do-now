@@ -68,7 +68,7 @@ function DailyViewer() {
     if (cooltime.current) return;
     if (e.deltaY > 0) {
       // wheel down
-      const tmpIndex = Math.min(taskOrders.length - 1, taskIndex + 1);
+      const tmpIndex = Math.min(dailyTasks.length - 1, taskIndex + 1);
       setTaskIndex(tmpIndex);
     } else {
       // wheel up
