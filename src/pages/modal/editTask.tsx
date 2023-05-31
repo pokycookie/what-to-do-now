@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
 
@@ -9,58 +9,117 @@ import duration from "dayjs/plugin/duration";
 
 import { css } from "@emotion/react";
 import { useDataStore, useModalStore, useToastStore } from "@/store";
-import { makeUUID } from "@/utils";
 import { backBtnCSS } from "@/styles/component";
-import Toggle from "@/components/button/toggle";
 import Calendar from "@/components/calendar/calendar";
 import TimeSelector from "@/components/selector/timeSelector";
-import { bgDark, bgGrey } from "@/styles/color";
+import { bgDark, bgGrey, textRed } from "@/styles/color";
+import { getDuration, makeUUID } from "@/utils";
 
 dayjs.extend(duration);
 
-function AddTask() {
-  const [start, setStart] = useState<Date>(new Date());
-  const [end, setEnd] = useState<Date>(new Date());
-  const [timeTaken, setTimeTaken] = useState(0);
-  const [isFixed, setIsFixed] = useState(false);
-  const [taskName, setTaskName] = useState("");
+function EditTask() {
+  const data = useModalStore((state) => state.payload);
 
-  const { addFixedTask, addTask } = useDataStore();
+  const [start, setStart] = useState<Date>(
+    data?.data?.startTime ?? data?.data?.deadline ?? new Date()
+  );
+  const [end, setEnd] = useState<Date>(data?.data?.endTime ?? new Date());
+  const [timeTaken, setTimeTaken] = useState(data?.data?.timeTaken ?? 0);
+  const [taskName, setTaskName] = useState(data?.data?.taskName ?? "");
+
+  const { editFixedTask, editTask, delTask, delFixedTask, delPastTask, addTask } = useDataStore();
   const closeModal = useModalStore((state) => state.closeModal);
   const addMessage = useToastStore((state) => state.addMessage);
 
-  const addHandler = () => {
-    if (isFixed) {
-      // Add fixedTask
-      if (taskName.trim() === "") {
-        // taskName empty error
-        addMessage("일정의 이름을 입력해주세요", "warning");
-      } else if (!dayjs(end).isAfter(start, "minute")) {
-        // start, end time error
-        addMessage("시간을 다시 설정해주세요", "warning");
-      } else {
-        addFixedTask({
-          id: makeUUID(),
-          taskName,
-          startTime: start,
-          endTime: end,
-        });
-        addMessage("고정일정이 추가되었습니다.", "success");
-        closeModal();
-      }
-    } else {
-      // Add task
-      if (taskName.trim() === "") {
-        // taskName empty error
-        addMessage("일정의 이름을 입력해주세요", "warning");
-      } else if (timeTaken <= 0) {
-        // timeTaken error
-        addMessage("소요시간은 1분 이상이어야 합니다", "warning");
-      } else {
-        addTask({ id: makeUUID(), taskName, deadline: start, timeTaken });
-        addMessage("일정이 추가되었습니다.", "success");
-        closeModal();
-      }
+  const dataExist = useMemo(() => {
+    if (!data) return false;
+    if (!data.type) return false;
+    if (!data.data?.id) return false;
+    if (!data.data?.taskName) return false;
+    return true;
+  }, [data]);
+
+  const deleteHandler = () => {
+    if (!dataExist) {
+      addMessage("알 수 없는 오류로 일정 삭제에 실패했습니다", "danger");
+      closeModal();
+      return;
+    }
+    switch (data.type) {
+      case "task":
+        delTask(data.data.id);
+        break;
+      case "fixedTask":
+        delFixedTask(data.data.id);
+        break;
+      case "pastTask":
+        delPastTask(data.data.id);
+        break;
+      default:
+        break;
+    }
+    closeModal();
+    addMessage(`'${data.data.taskName}' 일정이 삭제되었습니다`, "success");
+  };
+
+  const editHandler = () => {
+    if (!dataExist) {
+      addMessage("알 수 없는 오류로 일정 수정에 실패했습니다", "danger");
+      closeModal();
+      return;
+    }
+    switch (data.type) {
+      case "fixedTask":
+        if (taskName.trim() === "") {
+          // taskName empty error
+          addMessage("일정의 이름을 입력해주세요", "warning");
+        } else if (!dayjs(end).isAfter(start, "minute")) {
+          // start, end time error
+          addMessage("시간을 다시 설정해주세요", "warning");
+        } else {
+          editFixedTask(data.data.id, {
+            taskName,
+            startTime: start,
+            endTime: end,
+          });
+          addMessage("고정일정이 수정되었습니다.", "success");
+          closeModal();
+        }
+        break;
+      case "task":
+        if (taskName.trim() === "") {
+          // taskName empty error
+          addMessage("일정의 이름을 입력해주세요", "warning");
+        } else if (timeTaken <= 0) {
+          // timeTaken error
+          addMessage("소요시간은 1분 이상이어야 합니다", "warning");
+        } else {
+          editTask(data.data.id, { taskName, deadline: start, timeTaken });
+          addMessage("일정이 수정되었습니다.", "success");
+          closeModal();
+        }
+        break;
+      case "pastTask":
+        if (taskName.trim() === "") {
+          // taskName empty error
+          addMessage("일정의 이름을 입력해주세요", "warning");
+        } else if (timeTaken <= 0) {
+          // timeTaken error
+          addMessage("소요시간은 1분 이상이어야 합니다", "warning");
+        } else if (dayjs(start).diff(new Date()) < 0) {
+          addMessage(
+            "일정 복구를 위해서는 마감시간이 현재시간 이후로 설정되어야 합니다",
+            "warning"
+          );
+        } else {
+          addTask({ id: makeUUID(), taskName, deadline: start, timeTaken });
+          delPastTask(data.data.id);
+          addMessage("일정이 복구되었습니다.", "success");
+          closeModal();
+        }
+        break;
+      default:
+        break;
     }
   };
 
@@ -72,11 +131,6 @@ function AddTask() {
     }
   };
 
-  useEffect(() => {
-    setEnd(start);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFixed]);
-
   return (
     <div css={addTaskCSS}>
       <div css={{ width: "100%" }}>
@@ -85,18 +139,14 @@ function AddTask() {
             <button css={backBtnCSS} onClick={closeModal}>
               <FontAwesomeIcon icon={faArrowLeft} />
             </button>
-            <p>일정 추가</p>
-          </div>
-          <div css={optionAreaCSS}>
-            <p>고정 일정</p>
-            <Toggle onChange={(bool) => setIsFixed(bool)} />
+            <p>일정 수정</p>
           </div>
         </div>
         <div css={inputAreaCSS}>
           <input
             css={inputCSS}
             type="text"
-            placeholder="💡 추가할 일정을 알려주세요"
+            placeholder="일정의 이름을 수정하세요"
             autoFocus
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
@@ -120,11 +170,12 @@ function AddTask() {
                 .toDate()
             );
           }}
-          range={isFixed}
+          range={data?.type === "fixedTask"}
         />
         <div css={timeCSS}>
           <p className="indicator">
-            {start.toLocaleDateString()} {start.toLocaleTimeString()} {isFixed ? "부터" : "까지"}
+            {start.toLocaleDateString()} {start.toLocaleTimeString()}{" "}
+            {data?.type === "fixedTask" ? "부터" : "까지"}
           </p>
           <TimeSelector
             onChange={(hour, minute) => timeHandler(hour, minute, "start")}
@@ -132,7 +183,7 @@ function AddTask() {
             minute={start.getMinutes()}
           />
         </div>
-        {isFixed ? (
+        {data?.type === "fixedTask" ? (
           <motion.div css={timeCSS} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
             <p className="indicator">
               {end.toLocaleDateString()} {end.toLocaleTimeString()} 까지
@@ -144,12 +195,9 @@ function AddTask() {
             />
           </motion.div>
         ) : null}
-        {!isFixed ? (
+        {data?.type !== "fixedTask" ? (
           <motion.div css={timeCSS} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-            <p className="indicator">
-              소요시간 {dayjs.duration(timeTaken, "minutes").hours()}시간{" "}
-              {dayjs.duration(timeTaken, "minutes").minutes()}분 예상
-            </p>
+            <p className="indicator">소요시간 {getDuration(timeTaken)} 예상</p>
             <TimeSelector
               hour={dayjs.duration(timeTaken, "minutes").hours()}
               minute={dayjs.duration(timeTaken, "minutes").minutes()}
@@ -161,8 +209,11 @@ function AddTask() {
         ) : null}
       </div>
       <div css={btnAreaCSS}>
-        <button css={submitBtnCSS} onClick={addHandler}>
-          추가
+        <button css={[submitBtnCSS, deleteBtnCSS]} onClick={deleteHandler}>
+          삭제
+        </button>
+        <button css={submitBtnCSS} onClick={editHandler}>
+          {data?.type === "pastTask" ? "복구" : "수정"}
         </button>
       </div>
     </div>
@@ -185,12 +236,13 @@ const btnAreaCSS = css({
   display: "flex",
   justifyContent: "flex-end",
   alignItems: "center",
+  gap: "10px",
 
   marginTop: "10px",
 });
 
 const submitBtnCSS = css({
-  width: "150px",
+  width: "120px",
   height: "38px",
 
   borderRadius: "4px",
@@ -202,6 +254,12 @@ const submitBtnCSS = css({
 
   ":hover": {
     backgroundColor: bgGrey,
+  },
+});
+
+const deleteBtnCSS = css({
+  ":hover": {
+    backgroundColor: textRed,
   },
 });
 
@@ -219,16 +277,6 @@ const titleCSS = css({
   gap: "10px",
 
   fontSize: "16px",
-  fontWeight: 500,
-});
-
-const optionAreaCSS = css({
-  display: "flex",
-  justifyContent: "flex-end",
-  alignItems: "center",
-  gap: "10px",
-
-  fontSize: "12px",
   fontWeight: 500,
 });
 
@@ -270,4 +318,4 @@ const timeCSS = css({
   color: "hsl(0, 0%, 50%)",
 });
 
-export default AddTask;
+export default EditTask;

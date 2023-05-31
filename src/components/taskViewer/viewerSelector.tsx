@@ -22,7 +22,10 @@ function ViewerSelector(props: IProps) {
   };
 
   return (
-    <div css={selectorCSS} onClick={clickHandler}>
+    <div
+      css={[selectorCSS, { color: page === "main" ? textOrange : bgDark }]}
+      onClick={clickHandler}
+    >
       <FontAwesomeIcon icon={isDaily ? faClock : faCalendar} />
     </div>
   );
