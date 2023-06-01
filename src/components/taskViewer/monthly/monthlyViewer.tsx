@@ -183,10 +183,11 @@ function MonthlyViewer(props: IProps) {
                     >
                       {selected.taskName}
                     </Marquee>
-                    <p css={taskTimeCSS}>
-                      {dayjs(selected.startTime).format("HH:mm")} ~{" "}
-                      {dayjs(selected.endTime).format("HH:mm")}
-                    </p>
+                    <Marquee emotion={taskTimeCSS} animate speed={0.2}>
+                      {`${dayjs(selected.startTime).format("HH:mm")} ~ ${dayjs(
+                        selected.endTime
+                      ).format("HH:mm")}`}
+                    </Marquee>
                   </motion.div>
                 </div>
               ) : null}

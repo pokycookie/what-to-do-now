@@ -42,6 +42,7 @@ export const backBtnCSS = css({
 });
 
 export const textOverflowCSS = css({
+  width: "100%",
   overflow: "hidden",
   whiteSpace: "nowrap",
   textOverflow: "ellipsis",

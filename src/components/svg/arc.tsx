@@ -1,12 +1,16 @@
+import { css } from "@emotion/react";
+
 interface IProps {
   startDeg: number;
   endDeg: number;
   size?: number;
   holeSize?: number;
   color?: string;
+  hoverColor?: string;
   strokeWidth?: number;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  onClick?: () => void;
   clipPath?: string;
   clipPathSize?: number;
 }
@@ -19,31 +23,23 @@ function SvgArc(props: IProps) {
   const outer = ((props.size ?? 100) - strokeWidth) * (clipPathSize / 200);
   const inner = ((props.holeSize ?? 80) + strokeWidth) * (clipPathSize / 200);
 
-  const start = getPos(
-    props.startDeg,
-    outer,
-    clipPathSize / 2,
-    clipPathSize / 2
-  );
+  const start = getPos(props.startDeg, outer, clipPathSize / 2, clipPathSize / 2);
   const end = getPos(props.endDeg, outer, clipPathSize / 2, clipPathSize / 2);
 
-  const innerStart = getPos(
-    props.startDeg,
-    inner,
-    clipPathSize / 2,
-    clipPathSize / 2
-  );
-  const innerEnd = getPos(
-    props.endDeg,
-    inner,
-    clipPathSize / 2,
-    clipPathSize / 2
-  );
+  const innerStart = getPos(props.startDeg, inner, clipPathSize / 2, clipPathSize / 2);
+  const innerEnd = getPos(props.endDeg, inner, clipPathSize / 2, clipPathSize / 2);
 
   const startDeg = props.startDeg;
   const endDeg = props.endDeg < startDeg ? props.endDeg + 360 : props.endDeg;
 
   const largeArcFlag = endDeg - startDeg < 180 ? 0 : 1;
+
+  const pathCSS = css({
+    cursor: props.onClick ? "pointer" : "auto",
+    ":hover": {
+      fill: props.onClick ? props.hoverColor ?? props.color : props.color ?? "black",
+    },
+  });
 
   if (props.clipPath) {
     return (
@@ -72,6 +68,8 @@ function SvgArc(props: IProps) {
       fill={props.color ?? "black"}
       onMouseEnter={props.onMouseEnter}
       onMouseLeave={props.onMouseLeave}
+      onClick={props.onClick}
+      css={pathCSS}
     />
   );
 }
