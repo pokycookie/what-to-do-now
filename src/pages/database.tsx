@@ -1,4 +1,4 @@
-import { bgDark, bgWhite, textOrange } from "@/styles/color";
+import { bgDark, bgWhite, textBlue, textOrange, textRed } from "@/styles/color";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useState } from "react";
@@ -9,6 +9,8 @@ import { textOverflowCSS } from "@/styles/component";
 import { IFixedTask, IPastTask, ITask } from "@/types";
 import duration from "dayjs/plugin/duration";
 import { getDuration } from "@/utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 
 dayjs.extend(duration);
 
@@ -24,11 +26,12 @@ function Database() {
           <TaskTypeLi onClick={() => setTaskType(2)}>지난 일정</TaskTypeLi>
           <motion.div animate={{ x: taskType * 105 }} css={selectorCSS}></motion.div>
         </TaskTypeSelector>
-        <div css={tableFieldCSS}>
+        <TableField taskType={taskType}>
           <p>일정</p>
           <p>{taskType === 1 ? "시작시간" : "종료시간"}</p>
           <p>{taskType === 1 ? "종료시간" : "소요시간"}</p>
-        </div>
+          {taskType === 2 ? <p></p> : undefined}
+        </TableField>
         <ul css={tableCSS}>
           <Table taskType={taskType} />
         </ul>
@@ -59,11 +62,11 @@ function Table({ taskType }: { taskType: number }) {
         <>
           {tasks.map((e) => {
             return (
-              <li css={tableListCSS} key={e.id} onClick={() => taskEditHandler(e)}>
+              <TableList key={e.id} onClick={() => taskEditHandler(e)} taskType={taskType}>
                 <p css={textOverflowCSS}>{e.taskName}</p>
                 <p>{dayjs(e.deadline).format("YYYY-MM-DD HH:mm:ss")}</p>
                 <p>{getDuration(e.timeTaken)}</p>
-              </li>
+              </TableList>
             );
           })}
         </>
@@ -73,11 +76,11 @@ function Table({ taskType }: { taskType: number }) {
         <>
           {fixedTasks.map((e) => {
             return (
-              <li css={tableListCSS} key={e.id} onClick={() => fixedTaskEditHandler(e)}>
+              <TableList key={e.id} onClick={() => fixedTaskEditHandler(e)} taskType={taskType}>
                 <p css={textOverflowCSS}>{e.taskName}</p>
                 <p>{dayjs(e.startTime).format("YYYY-MM-DD HH:mm:ss")}</p>
                 <p>{dayjs(e.endTime).format("YYYY-MM-DD HH:mm:ss")}</p>
-              </li>
+              </TableList>
             );
           })}
         </>
@@ -87,11 +90,15 @@ function Table({ taskType }: { taskType: number }) {
         <>
           {pastTasks.map((e) => {
             return (
-              <li css={tableListCSS} key={e.id} onClick={() => pastTaskEditHandler(e)}>
+              <TableList key={e.id} onClick={() => pastTaskEditHandler(e)} taskType={taskType}>
                 <p css={textOverflowCSS}>{e.taskName}</p>
                 <p>{dayjs(e.deadline).format("YYYY-MM-DD HH:mm:ss")}</p>
                 <p>{getDuration(e.timeTaken)}</p>
-              </li>
+                <FontAwesomeIcon
+                  css={{ color: e.success ? textBlue : textRed }}
+                  icon={e.success ? faCircleCheck : faCircleXmark}
+                />
+              </TableList>
             );
           })}
         </>
@@ -160,12 +167,12 @@ const selectorCSS = css({
   borderRadius: "100px",
 });
 
-const tableFieldCSS = css({
+const TableField = styled.div<{ taskType: number }>((props) => ({
   width: "100%",
   height: "42px",
 
   display: "grid",
-  gridTemplateColumns: "1fr 200px 200px",
+  gridTemplateColumns: props.taskType === 2 ? "1fr 200px 200px 30px" : "1fr 200px 200px",
   justifyItems: "start",
   alignItems: "center",
 
@@ -177,7 +184,7 @@ const tableFieldCSS = css({
   borderTop: `1px solid ${bgDark}`,
   borderBottom: `1px solid ${bgDark}`,
   padding: "0px 10px",
-});
+}));
 
 const tableCSS = css({
   flex: 1,
@@ -187,12 +194,12 @@ const tableCSS = css({
   overflowY: "auto",
 });
 
-const tableListCSS = css({
+const TableList = styled.li<{ taskType: number }>((props) => ({
   width: "100%",
   height: "42px",
 
   display: "grid",
-  gridTemplateColumns: "1fr 200px 200px",
+  gridTemplateColumns: props.taskType === 2 ? "1fr 200px 200px 30px" : "1fr 200px 200px",
   justifyItems: "start",
   alignItems: "center",
 
@@ -204,6 +211,6 @@ const tableListCSS = css({
   ":hover": {
     backgroundColor: bgWhite,
   },
-});
+}));
 
 export default Database;

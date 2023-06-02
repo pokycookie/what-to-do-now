@@ -9,7 +9,7 @@ import { bgDark, bgWhite, textBlue, textRed } from "@/styles/color";
 import SvgDonut from "@/components/svg/donut";
 import SvgArc from "@/components/svg/arc";
 import { IDailyArc } from "@/types";
-import { getDailyArc } from "@/utils";
+import { getDailyArc, makeUUID } from "@/utils";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleMinus, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
@@ -25,7 +25,7 @@ function DailyViewer() {
   const [isHover, setIsHover] = useState(false);
 
   const { currentTime } = useAppDataStore();
-  const { taskOrders, fixedTasks } = useDataStore();
+  const { tasks, taskOrders, fixedTasks, delTask, addPastTask } = useDataStore();
   const addMessage = useToastStore((state) => state.addMessage);
 
   const dateMemo = useRef(currentTime);
@@ -50,14 +50,26 @@ function DailyViewer() {
 
   const doneHandler = () => {
     const selectedTask = dailyTasks[taskIndex];
-    addMessage(`${selectedTask.taskName}, ${selectedTask.id}`, "success");
-    console.log(selectedTask.taskName, selectedTask.id);
+    const task = tasks.find((e) => e.id === selectedTask.id);
+    if (task) {
+      delTask(selectedTask.id);
+      addPastTask({ ...task, id: makeUUID(), success: true });
+      addMessage(`${selectedTask.taskName}일정을 완료처리 했습니다`, "success");
+    } else {
+      addMessage("알 수 없는 오류로 일정 완료에 실패했습니다", "danger");
+    }
   };
 
   const giveupHandler = () => {
     const selectedTask = dailyTasks[taskIndex];
-    addMessage(`${selectedTask.taskName}, ${selectedTask.id}`, "warning");
-    console.log(selectedTask.taskName, selectedTask.id);
+    const task = tasks.find((e) => e.id === selectedTask.id);
+    if (task) {
+      delTask(selectedTask.id);
+      addPastTask({ ...task, id: makeUUID(), success: false });
+      addMessage(`${selectedTask.taskName}일정을 실패처리 했습니다`, "success");
+    } else {
+      addMessage("알 수 없는 오류로 일정 완료에 실패했습니다", "danger");
+    }
   };
 
   const clickHandler = (task: IDailyArc) => {

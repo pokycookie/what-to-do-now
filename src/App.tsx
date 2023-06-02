@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
 import Nav from "./components/navigator/nav";
-import Main from "./pages/main";
 import ModalIndex from "./pages/modal";
 import "./styles/globals.scss";
 import { useAppDataStore, useDataStore } from "./store";
 import { IFile } from "./types";
-import { getTaskOrder } from "./utils";
+import { getTaskOrder, makeUUID } from "./utils";
 import { useInterval } from "./hooks";
 import dayjs from "dayjs";
 import Toast from "./components/toast";
@@ -28,7 +27,7 @@ export default function App() {
     for (let i = 0; i < tasks.length; i++) {
       if (dayjs(sortedTasks[i].deadline).isBefore(now, "minute")) {
         dataStore.delTask(sortedTasks[i].id);
-        dataStore.addPastTask({ ...sortedTasks[i], success: false });
+        dataStore.addPastTask({ ...sortedTasks[i], id: makeUUID(), success: false });
       } else {
         break;
       }
