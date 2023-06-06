@@ -3,16 +3,33 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ko";
-import { useAppDataStore, useDataStore, useToastStore } from "@/store";
+import {
+  useAppDataStore,
+  useDataStore,
+  useModalStore,
+  useToastStore,
+} from "@/store";
 import { css } from "@emotion/react";
-import { bgDark, bgWhite, textBlue, textRed } from "@/styles/color";
+import {
+  bgDark,
+  bgWhite,
+  blue400,
+  blue500,
+  red400,
+  red500,
+  textBlue,
+  textRed,
+} from "@/styles/color";
 import SvgDonut from "@/components/svg/donut";
 import SvgArc from "@/components/svg/arc";
 import { IDailyArc } from "@/types";
 import { getDailyArc, makeUUID } from "@/utils";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleMinus, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleMinus,
+  faCircleCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import IndexIndicator from "./indexIndicator";
 import { Marquee } from "@/components/marquee";
 
@@ -25,8 +42,10 @@ function DailyViewer() {
   const [isHover, setIsHover] = useState(false);
 
   const { currentTime } = useAppDataStore();
-  const { tasks, taskOrders, fixedTasks, delTask, addPastTask } = useDataStore();
+  const { tasks, taskOrders, fixedTasks, delTask, addPastTask } =
+    useDataStore();
   const addMessage = useToastStore((state) => state.addMessage);
+  const openModal = useModalStore((state) => state.openModal);
 
   const dateMemo = useRef(currentTime);
   const cooltime = useRef(false);
@@ -40,7 +59,9 @@ function DailyViewer() {
   }, [dateMemo, taskOrders, fixedTasks]);
 
   const currentTimeDegree =
-    (dayjs(currentTime).diff(dayjs(currentTime).startOf("day"), "minute") / 1440) * 360;
+    (dayjs(currentTime).diff(dayjs(currentTime).startOf("day"), "minute") /
+      1440) *
+    360;
 
   const dailyTasks = useMemo(() => {
     return [...taskOrders]
@@ -73,7 +94,10 @@ function DailyViewer() {
   };
 
   const clickHandler = (task: IDailyArc) => {
-    console.log(task);
+    const data = tasks.find((e) => e.id === task.id);
+    if (data) {
+      openModal("editTask", { type: "task", data });
+    }
   };
 
   const wheelHandler = (e: React.WheelEvent<HTMLDivElement>) => {
@@ -107,15 +131,21 @@ function DailyViewer() {
     <div css={dailyViewerCSS} onWheel={wheelHandler}>
       <SvgDonut color="#2c3333" holeSize={85} overlay />
       <svg viewBox="0 0 200 200" css={{ position: "absolute" }}>
-        <SvgArc startDeg={0} endDeg={currentTimeDegree} size={89} holeSize={87} color="#FF6000" />
+        <SvgArc
+          startDeg={0}
+          endDeg={currentTimeDegree}
+          size={89}
+          holeSize={87}
+          color="#FF6000"
+        />
         {dailyArc.map((task, i) => {
           return (
             <SvgArc
               key={i}
               startDeg={task.startDeg}
               endDeg={task.endDeg}
-              color={task.type === "task" ? "#0096ff" : "#eb1d36"}
-              hoverColor={task.type === "task" ? "#4CB4FF" : "#F05A6C"}
+              color={task.type === "task" ? blue500 : red500}
+              hoverColor={task.type === "task" ? blue400 : red400}
               strokeWidth={1}
               holeSize={90}
               onMouseEnter={() => setSelected(task)}
@@ -126,7 +156,11 @@ function DailyViewer() {
         })}
       </svg>
       <div css={indexIndicatorAreaCSS}>
-        <IndexIndicator index={taskIndex} length={dailyTasks.length} setIndex={setTaskIndex} />
+        <IndexIndicator
+          index={taskIndex}
+          length={dailyTasks.length}
+          setIndex={setTaskIndex}
+        />
       </div>
       <div css={indicatorCSS}>
         {dailyTasks.length > 0 ? (
@@ -139,10 +173,15 @@ function DailyViewer() {
                   onMouseEnter={() => setIsHover(true)}
                   onMouseLeave={() => setIsHover(false)}
                 >
-                  <Marquee emotion={taskNameCSS} animate={isHover && i === taskIndex}>
+                  <Marquee
+                    emotion={taskNameCSS}
+                    animate={isHover && i === taskIndex}
+                  >
                     {task.taskName}
                   </Marquee>
-                  <p css={taskTimeCSS}>{`${dayjs(task.endTime).locale("ko").fromNow()} 마감`}</p>
+                  <p css={taskTimeCSS}>{`${dayjs(task.endTime)
+                    .locale("ko")
+                    .fromNow()} 마감`}</p>
                 </li>
               );
             })}
@@ -174,12 +213,17 @@ function DailyViewer() {
       {selected ? (
         <div css={selectedTaskAreaCSS}>
           <Marquee
-            emotion={[taskNameCSS, { color: selected.type === "task" ? textBlue : textRed }]}
+            emotion={[
+              taskNameCSS,
+              { color: selected.type === "task" ? textBlue : textRed },
+            ]}
             animate
           >
             {selected.taskName}
           </Marquee>
-          <p css={taskTimeCSS}>{`${dayjs(selected.endTime).locale("ko").fromNow()} 마감`}</p>
+          <p css={taskTimeCSS}>{`${dayjs(selected.endTime)
+            .locale("ko")
+            .fromNow()} 마감`}</p>
         </div>
       ) : null}
     </div>

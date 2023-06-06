@@ -1,6 +1,7 @@
 type TTask = "task" | "fixedTask";
 
 interface ITask {
+  [key: string]: any;
   id: string;
   taskName: string;
   timeTaken: number;
@@ -8,6 +9,7 @@ interface ITask {
 }
 
 interface IFixedTask {
+  [key: string]: any;
   id: string;
   taskName: string;
   startTime: Date;
