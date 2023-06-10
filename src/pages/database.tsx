@@ -1,4 +1,12 @@
-import { bgDark, bgWhite, textBlue, textOrange, textRed } from "@/styles/color";
+import {
+  bgDark,
+  bgWhite,
+  blue400,
+  blue500,
+  red400,
+  red500,
+  textOrange,
+} from "@/styles/color";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useState } from "react";
@@ -10,7 +18,10 @@ import { IFixedTask, IPastTask, ITask } from "@/types";
 import duration from "dayjs/plugin/duration";
 import { getDuration } from "@/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleCheck,
+  faCircleXmark,
+} from "@fortawesome/free-solid-svg-icons";
 
 dayjs.extend(duration);
 
@@ -24,7 +35,10 @@ function Database() {
           <TaskTypeLi onClick={() => setTaskType(0)}>일정</TaskTypeLi>
           <TaskTypeLi onClick={() => setTaskType(1)}>고정 일정</TaskTypeLi>
           <TaskTypeLi onClick={() => setTaskType(2)}>지난 일정</TaskTypeLi>
-          <motion.div animate={{ x: taskType * 105 }} css={selectorCSS}></motion.div>
+          <motion.div
+            animate={{ x: taskType * 105 }}
+            css={selectorCSS}
+          ></motion.div>
         </TaskTypeSelector>
         <TableField taskType={taskType}>
           <p>일정</p>
@@ -41,7 +55,7 @@ function Database() {
 }
 
 function Table({ taskType }: { taskType: number }) {
-  const { tasks, fixedTasks, pastTasks } = useDataStore();
+  const { tasks, fixedTasks, pastTasks, editPastTask } = useDataStore();
   const openModal = useModalStore((state) => state.openModal);
 
   const taskEditHandler = (task: ITask) => {
@@ -52,7 +66,21 @@ function Table({ taskType }: { taskType: number }) {
     openModal("editTask", { type: "fixedTask", data: fixedTask });
   };
 
-  const pastTaskEditHandler = (pastTask: IPastTask) => {
+  const pastTaskEditHandler = (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    pastTask: IPastTask
+  ) => {
+    const currentTarget = e.currentTarget as HTMLElement;
+    let currentElement: HTMLElement | null = e.target as HTMLElement;
+
+    while (currentElement && currentElement !== currentTarget) {
+      if (currentElement.classList.contains("successIcon")) {
+        editPastTask(pastTask.id, { success: !pastTask.success });
+        return;
+      }
+      currentElement = currentElement.parentElement;
+    }
+
     openModal("editTask", { type: "pastTask", data: pastTask });
   };
 
@@ -62,7 +90,11 @@ function Table({ taskType }: { taskType: number }) {
         <>
           {tasks.map((e) => {
             return (
-              <TableList key={e.id} onClick={() => taskEditHandler(e)} taskType={taskType}>
+              <TableList
+                key={e.id}
+                onClick={() => taskEditHandler(e)}
+                taskType={taskType}
+              >
                 <p css={textOverflowCSS}>{e.taskName}</p>
                 <p>{dayjs(e.deadline).format("YYYY-MM-DD HH:mm:ss")}</p>
                 <p>{getDuration(e.timeTaken)}</p>
@@ -76,7 +108,11 @@ function Table({ taskType }: { taskType: number }) {
         <>
           {fixedTasks.map((e) => {
             return (
-              <TableList key={e.id} onClick={() => fixedTaskEditHandler(e)} taskType={taskType}>
+              <TableList
+                key={e.id}
+                onClick={() => fixedTaskEditHandler(e)}
+                taskType={taskType}
+              >
                 <p css={textOverflowCSS}>{e.taskName}</p>
                 <p>{dayjs(e.startTime).format("YYYY-MM-DD HH:mm:ss")}</p>
                 <p>{dayjs(e.endTime).format("YYYY-MM-DD HH:mm:ss")}</p>
@@ -90,12 +126,17 @@ function Table({ taskType }: { taskType: number }) {
         <>
           {pastTasks.map((e) => {
             return (
-              <TableList key={e.id} onClick={() => pastTaskEditHandler(e)} taskType={taskType}>
+              <TableList
+                key={e.id}
+                onClick={(event) => pastTaskEditHandler(event, e)}
+                taskType={taskType}
+              >
                 <p css={textOverflowCSS}>{e.taskName}</p>
                 <p>{dayjs(e.deadline).format("YYYY-MM-DD HH:mm:ss")}</p>
                 <p>{getDuration(e.timeTaken)}</p>
                 <FontAwesomeIcon
-                  css={{ color: e.success ? textBlue : textRed }}
+                  className="successIcon"
+                  css={iconCSS(e.success)}
                   icon={e.success ? faCircleCheck : faCircleXmark}
                 />
               </TableList>
@@ -172,7 +213,8 @@ const TableField = styled.div<{ taskType: number }>((props) => ({
   height: "42px",
 
   display: "grid",
-  gridTemplateColumns: props.taskType === 2 ? "1fr 200px 200px 30px" : "1fr 200px 200px",
+  gridTemplateColumns:
+    props.taskType === 2 ? "1fr 200px 200px 30px" : "1fr 200px 200px",
   justifyItems: "start",
   alignItems: "center",
 
@@ -199,7 +241,8 @@ const TableList = styled.li<{ taskType: number }>((props) => ({
   height: "42px",
 
   display: "grid",
-  gridTemplateColumns: props.taskType === 2 ? "1fr 200px 200px 30px" : "1fr 200px 200px",
+  gridTemplateColumns:
+    props.taskType === 2 ? "1fr 200px 200px 30px" : "1fr 200px 200px",
   justifyItems: "start",
   alignItems: "center",
 
@@ -212,5 +255,15 @@ const TableList = styled.li<{ taskType: number }>((props) => ({
     backgroundColor: bgWhite,
   },
 }));
+
+const iconCSS = (success: boolean) =>
+  css({
+    color: success ? blue500 : red500,
+    justifySelf: "center",
+
+    ":hover": {
+      color: success ? blue400 : red400,
+    },
+  });
 
 export default Database;

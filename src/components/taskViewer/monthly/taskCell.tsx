@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { useMemo } from "react";
 import { css } from "@emotion/react";
-import { useDataStore } from "@/store";
+import { useDataStore, useModalStore } from "@/store";
 import { bgDark, textBlue } from "@/styles/color";
 import { ITask, ITaskOrder } from "@/types";
 
@@ -22,6 +22,7 @@ interface IProps {
 
 function TaskCell(props: IProps) {
   const { taskOrders, tasks } = useDataStore();
+  const openModal = useModalStore((state) => state.openModal);
 
   const taskCells = useMemo(() => {
     return taskOrders
@@ -62,6 +63,13 @@ function TaskCell(props: IProps) {
     }
   };
 
+  const clickHandler = (task: ITaskCell) => {
+    const data = tasks.find((e) => e.id === task.data.id);
+    if (data) {
+      openModal("editTask", { type: "task", data });
+    }
+  };
+
   return (
     <div css={taskCellCSS}>
       {taskCells.map((task, i) => {
@@ -72,6 +80,7 @@ function TaskCell(props: IProps) {
             style={{ width: `${task.width}%`, left: `${task.left}%` }}
             onMouseEnter={() => hoverHandler(task)}
             onMouseLeave={props.onLeave}
+            onClick={() => clickHandler(task)}
           ></div>
         );
       })}

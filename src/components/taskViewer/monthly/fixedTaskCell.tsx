@@ -1,4 +1,4 @@
-import { useDataStore } from "@/store";
+import { useDataStore, useModalStore } from "@/store";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { useMemo } from "react";
@@ -22,6 +22,7 @@ interface IProps {
 
 function FixedTaskCell(props: IProps) {
   const { fixedTasks } = useDataStore();
+  const openModal = useModalStore((state) => state.openModal);
 
   const fixedTaskCells = useMemo(() => {
     return fixedTasks
@@ -59,6 +60,13 @@ function FixedTaskCell(props: IProps) {
     if (props.onHover) props.onHover(task.data);
   };
 
+  const clickHandler = (task: IFixedTaskCell) => {
+    const data = fixedTasks.find((e) => e.id === task.data.id);
+    if (data) {
+      openModal("editTask", { type: "fixedTask", data });
+    }
+  };
+
   return (
     <div css={fixedTaskCellCSS}>
       {fixedTaskCells.map((task, i) => {
@@ -69,6 +77,7 @@ function FixedTaskCell(props: IProps) {
             style={{ width: `${task.width}%`, left: `${task.left}%` }}
             onMouseEnter={() => hoverHandler(task)}
             onMouseLeave={props.onLeave}
+            onClick={() => clickHandler(task)}
           ></div>
         );
       })}
