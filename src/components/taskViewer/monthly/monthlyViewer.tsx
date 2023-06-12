@@ -136,7 +136,10 @@ function MonthlyViewer(props: IProps) {
         <button css={navBtnCSS} onClick={() => monthHadler(-1)}>
           <FontAwesomeIcon icon={faAngleLeft} />
         </button>
-        <button css={[navBtnCSS, { width: "100%", fontWeight: 600 }]} onClick={setToday}>
+        <button
+          css={[navBtnCSS, { width: "100%", fontWeight: 600 }]}
+          onClick={setToday}
+        >
           {year}.{getDoubleDigit(month + 1)}
         </button>
         <button css={navBtnCSS} onClick={() => monthHadler(1)}>
@@ -176,7 +179,9 @@ function MonthlyViewer(props: IProps) {
                     <Marquee
                       emotion={[
                         taskNameCSS,
-                        { color: selected.type === "task" ? textBlue : textRed },
+                        {
+                          color: selected.type === "task" ? textBlue : textRed,
+                        },
                       ]}
                       animate
                       speed={0.5}
@@ -288,6 +293,7 @@ const tableValueCSS = css({
   position: "absolute",
   top: "5px",
   left: "5px",
+  textDecoration: "inherit",
 });
 
 const toolTipAreaCSS = css({
