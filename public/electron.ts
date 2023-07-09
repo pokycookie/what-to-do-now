@@ -14,16 +14,21 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      devTools: !app.isPackaged,
     },
+    // frame: false,
   });
-  window.loadURL("http://localhost:3000");
 
-  // const startURL = url.format({
-  //   pathname: path.join(__dirname, "/../build/index.html"),
-  //   protocol: "file:",
-  //   slashes: true,
-  // });
-  // window.loadURL(startURL);
+  window.setMenu(null);
+
+  const startURL = url.format({
+    pathname: path.join(__dirname, "/../build/index.html"),
+    protocol: "file:",
+    slashes: true,
+  });
+  window.loadURL(startURL);
+
+  // window.loadURL("http://localhost:3000");
 };
 
 app.on("window-all-closed", () => {

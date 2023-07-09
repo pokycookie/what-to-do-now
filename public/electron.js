@@ -39,6 +39,7 @@ exports.__esModule = true;
 var electron_1 = require("electron");
 var path = require("path");
 var fs = require("fs");
+var url = require("url");
 var fileDataPath = path.join(electron_1.app.getPath("userData"), "./taskData");
 var createWindow = function () {
     var window = new electron_1.BrowserWindow({
@@ -48,16 +49,18 @@ var createWindow = function () {
         minHeight: 700,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            devTools: !electron_1.app.isPackaged
         }
     });
-    window.loadURL("http://localhost:3000");
-    // const startURL = url.format({
-    //   pathname: path.join(__dirname, "/../build/index.html"),
-    //   protocol: "file:",
-    //   slashes: true,
-    // });
-    // window.loadURL(startURL);
+    window.setMenu(null);
+    var startURL = url.format({
+        pathname: path.join(__dirname, "/../build/index.html"),
+        protocol: "file:",
+        slashes: true
+    });
+    window.loadURL(startURL);
+    // window.loadURL("http://localhost:3000");
 };
 electron_1.app.on("window-all-closed", function () {
     if (process.platform !== "darwin")
